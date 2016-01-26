@@ -4,8 +4,9 @@
 #include "vec3.h"
 #include "vec4.h"
 #include "mat3.h"
+#include "AABB.h"
 
-#define TEST_VEC2 true
+//#define TEST_VEC2 false
 
 int main() {
 
@@ -21,6 +22,14 @@ int main() {
 	assert( v1 == v2 && "EQUALS FAILED" );
 
 #endif
+
+	std::vector<matth::vec2> points = { {4.0f, 5.0f},{ -5.4f, 2.3f },{ -7.0f, -1.0f },{ 5.0f, -2.0f } };
+	matth::AABB aabb = matth::AABB::genAABB( points );
+	std::cout << aabb.dim.x << " " << aabb.dim.y << std::endl;
+	std::cout << aabb.pos.x << " " << aabb.pos.y << std::endl << std::endl;
+	aabb.rotate( 135.0f );
+	std::cout << aabb.dim.x << " " << aabb.dim.y << std::endl;
+	std::cout << aabb.pos.x << " " << aabb.pos.y << std::endl << std::endl;
 
 	system( "pause" );
 

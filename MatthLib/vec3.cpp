@@ -76,14 +76,14 @@ namespace matth {
 		return{ lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
 	}
 
-	vec3 operator+=( vec3& lhs, const vec3& rhs ) {
+	vec3& operator+=( vec3& lhs, const vec3& rhs ) {
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
 		lhs.z += rhs.z;
 		return lhs;
 	}
 
-	vec3 operator-=( vec3& lhs, const vec3& rhs ) {
+	vec3& operator-=( vec3& lhs, const vec3& rhs ) {
 		lhs.x -= rhs.x;
 		lhs.y -= rhs.y;
 		lhs.z -= rhs.z;
@@ -103,14 +103,14 @@ namespace matth {
 		return{ lhs.x / val, lhs.y / val, lhs.z / val };
 	}
 
-	vec3 operator*=( vec3& lhs, float val ) {
+	vec3& operator*=( vec3& lhs, float val ) {
 		lhs.x *= val;
 		lhs.y *= val;
 		lhs.z *= val;
 		return lhs;
 	}
 
-	vec3 operator/=( vec3& lhs, float val ) {
+	vec3& operator/=( vec3& lhs, float val ) {
 		lhs.x /= val;
 		lhs.y /= val;
 		lhs.z /= val;

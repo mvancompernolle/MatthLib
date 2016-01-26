@@ -6,16 +6,18 @@
 
 namespace matth {
 
-	struct vec3 {
+	_declspec(align(32)) struct vec3 {
 		union {
 			struct { float x, y, z; };
-			struct { vec2 xy; float z; };
+			struct { float r, g, b; };
+			struct { vec2 xy; };
 			float v[3];
 		};
 
 		// offset opeartors
 		const float& operator[]( int pos ) const;
 		float& operator[]( int pos );
+
 
 		vec3 operator-() const;
 		vec3 reflect( const vec3& n ) const;
@@ -38,14 +40,15 @@ namespace matth {
 	// vector math
 	vec3 operator+( const vec3& lhs, const vec3& rhs );
 	vec3 operator-( const vec3& lhs, const vec3& rhs );
-	vec3 operator+=( vec3& lhs, const vec3& rhs );
-	vec3 operator-=( vec3& lhs, const vec3& rhs );
+	vec3& operator+=( vec3& lhs, const vec3& rhs );
+	vec3& operator-=( vec3& lhs, const vec3& rhs );
 	// scalar math
 	vec3 operator*( const vec3& lhs, float val );
 	vec3 operator*( float val, const vec3& lhs );
 	vec3 operator/( const vec3& lhs, float val );
-	vec3 operator*=( vec3& lhs, float val );
-	vec3 operator/=( vec3& lhs, float val );
+	vec3& operator*=( vec3& lhs, float val );
+	vec3& operator/=( vec3& lhs, float val );
+
 }
 
 

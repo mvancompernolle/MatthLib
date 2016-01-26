@@ -6,11 +6,13 @@
 
 namespace matth {
 
-	struct vec4 {
+	_declspec( align( 32 ) ) struct vec4 {
 		union {
 			struct { float x, y, z, w; };
-			struct { vec3 xyz; float w; };
-			struct { vec2 xy; float z, w; };
+			struct { vec3 xyz; };
+			struct { vec2 xy; };
+			struct { float r, g, b, a; };
+			struct { vec3 rgb; };
 			float v[4];
 		};
 
@@ -38,14 +40,14 @@ namespace matth {
 	// vector math
 	vec4 operator+( const vec4& lhs, const vec4& rhs );
 	vec4 operator-( const vec4& lhs, const vec4& rhs );
-	vec4 operator+=( vec4& lhs, const vec4& rhs );
-	vec4 operator-=( vec4& lhs, const vec4& rhs );
+	vec4& operator+=( vec4& lhs, const vec4& rhs );
+	vec4& operator-=( vec4& lhs, const vec4& rhs );
 	// scalar math
 	vec4 operator*( const vec4& lhs, float val );
 	vec4 operator*( float val, const vec4& lhs );
 	vec4 operator/( const vec4& lhs, float val );
-	vec4 operator*=( vec4& lhs, float val );
-	vec4 operator/=( vec4& lhs, float val );
+	vec4& operator*=( vec4& lhs, float val );
+	vec4& operator/=( vec4& lhs, float val );
 }
 
 

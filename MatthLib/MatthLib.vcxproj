@@ -126,6 +126,7 @@
     <ClCompile Include="vec4.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABB.h" />
     <ClInclude Include="mat3.h" />
     <ClInclude Include="mat4.h" />
     <ClInclude Include="vec2.h" />
