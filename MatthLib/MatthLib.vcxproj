@@ -118,6 +118,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="collision.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mat3.cpp" />
     <ClCompile Include="mat4.cpp" />
@@ -127,6 +128,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABB.h" />
+    <ClInclude Include="collision.h" />
+    <ClInclude Include="CollisionShapes.h" />
     <ClInclude Include="mat3.h" />
     <ClInclude Include="mat4.h" />
     <ClInclude Include="vec2.h" />

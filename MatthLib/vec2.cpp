@@ -20,7 +20,8 @@ namespace matth {
 	}
 
 	vec2 vec2::reflect( const vec2& n ) const {
-		return {*this - 2 * (dot(*this, n.normal()) * n.normal())};
+		vec2 norm = n.normal();
+		return{ *this - 2 * ( dot( *this, norm ) * norm ) };
 	}
 
 	float vec2::length() const {
@@ -46,9 +47,14 @@ namespace matth {
 		return lhs.x * rhs.x + lhs.y * rhs.y;
 	}
 
-	vec2 interp( const vec2& lhs, const vec2& rhs, float val ) {
+	vec2 projection( const vec2& lhs, const vec2& rhs ) {
+		vec2 norm = rhs.normal();
+		return dot( lhs, norm ) * norm;
+	}
+
+	vec2 lerp( const vec2& lhs, const vec2& rhs, float val ) {
 		val = std::fmax( 0.0f, std::fmin( val, 1.0f ) );
-		return{ lhs * val + ( rhs * ( 1.0f - val ) ) };
+		return{ (rhs - lhs)*val + lhs };
 	}
 
 	bool operator==( const vec2& lhs, const vec2& rhs ) {

@@ -11,6 +11,12 @@ namespace matth {
 			vec3 c[3];
 			float d[9];
 			float d2d[3][3];
+
+			struct {
+				union { vec3 c1; vec2 right; };
+				union { vec3 c2; vec2 up; };
+				union { vec3 c3; vec2 pos; };
+			};
 		};
 
 		const vec3& operator[]( int pos ) const;
@@ -23,9 +29,9 @@ namespace matth {
 		static mat3 zero();
 		static mat3 rotation( float degrees );
 		static mat3 translation( float x, float y );
-		static mat3 translation( vec2 trans );
+		static mat3 translation( const vec2& trans );
 		static mat3 scale( float x, float y );
-		static mat3 scale( vec2 s );
+		static mat3 scale( const vec2& s );
 
 	};
 	mat3 operator+( const mat3& lhs, const mat3& rhs );

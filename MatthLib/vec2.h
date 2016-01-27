@@ -30,7 +30,8 @@ namespace matth {
 	};
 
 	float dot( const vec2& lhs, const vec2& rhs );
-	vec2 interp( const vec2& lhs, const vec2& rhs, float val );
+	vec2 projection( const vec2& lhs, const vec2& rhs );
+	vec2 lerp( const vec2& lhs, const vec2& rhs, float val );
 
 	// boolean operators
 	bool operator==( const vec2& lhs, const vec2& rhs );

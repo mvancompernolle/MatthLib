@@ -32,9 +32,10 @@ namespace matth {
 		static mat4 zero();
 		static mat4 rotation( const vec3& rotationAxis, float degrees );
 		static mat4 translation( float x, float y, float z );
-		static mat4 translation( vec3 trans );
+		static mat4 translation( const vec3& trans );
 		static mat4 scale( float x, float y, float z );
-		static mat4 scale( vec3 s );
+		static mat4 scale( const vec3& s );
+		static mat4 ortho( float l, float r, float b, float t, float n, float f );
 	};
 
 	mat4 operator+( const mat4& lhs, const mat4& rhs );
