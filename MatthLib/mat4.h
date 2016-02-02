@@ -4,6 +4,7 @@
 
 #include "vec4.h"
 #include "mat3.h"
+#include <iostream>
 
 namespace matth {
 
@@ -11,8 +12,6 @@ namespace matth {
 
 		union {
 			vec4 c[4];
-			float d[16];
-			float d2d[4][4];
 			struct {
 				union { vec4 c1; vec3 right; };
 				union { vec4 c2; vec3 up; };
@@ -27,6 +26,7 @@ namespace matth {
 		mat4 inverse() const;
 		mat4 transpose() const;
 		float determinant() const;
+		operator float*( );
 
 		static mat4 identity();
 		static mat4 zero();
@@ -36,6 +36,10 @@ namespace matth {
 		static mat4 scale( float x, float y, float z );
 		static mat4 scale( const vec3& s );
 		static mat4 ortho( float l, float r, float b, float t, float n, float f );
+		static mat4 frustum( float l, float r, float b, float t, float n, float f );
+		static mat4 perspective( float fov, float aspect, float n, float f );
+		static mat4 lookAt( const vec3& eye, const vec3& target, const vec3& up );
+		static mat4 mat3ToMat4( float* mat3 );
 	};
 
 	mat4 operator+( const mat4& lhs, const mat4& rhs );
@@ -49,6 +53,7 @@ namespace matth {
 	mat4 operator*( const mat4& lhs, const mat4& rhs );
 	mat4& operator*=( mat4& lhs, const mat4& rhs );
 	vec4 operator*( const mat4& lhs, const vec4& rhs );
+	std::ostream& operator<<( std::ostream& os, const mat4& rhs );
 };
 
 

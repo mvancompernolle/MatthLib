@@ -24,7 +24,7 @@ namespace matth {
 		mat3 mat;
 		for ( int i = 0; i < 3; ++i ) {
 			for ( int j = 0; j < 3; ++j ) {
-				mat[i][j] = d2d[j][i];
+				mat[i][j] = c[j][i];
 			}
 		}
 		return mat;
@@ -32,15 +32,20 @@ namespace matth {
 
 	float mat3::determinant() const {
 		return c[0][0] * ( c[1][1] * c[2][2] - c[1][2] * c[2][1] ) +
-			c[0][1] * ( c[1][0] * c[2][2] - c[1][2] * c[2][0] ) +
-			c[0][2] * ( c[1][0] * c[2][1] - c[1][1] * c[2][0] );
+			c[1][0] * ( c[0][1] * c[2][2] - c[2][1] * c[0][2] ) +
+			c[2][0] * ( c[0][1] * c[1][2] - c[1][1] * c[0][2] );
+
+	}
+
+	mat3::operator float*( ) {
+		return (float*)c;
 	}
 
 	// static functions ///////////////////////////
 	mat3 mat3::identity() {
-		return{	1, 0, 0,
+		return{ 1, 0, 0,
 				0, 1, 0,
-				0, 0, 1};
+				0, 0, 1 };
 	}
 
 	mat3 mat3::zero() {
@@ -50,20 +55,18 @@ namespace matth {
 	}
 
 	mat3 mat3::rotation( float degrees ) {
-		float rads = degrees * ( PI / 180 );
-		return{
-			cos(rads),	-sin(rads),		0.0f,
-			sin(rads),	cos(rads),		0.0f,
-			0.0f,		0.0f,			1.0f
-		};
+		float rads = degrees * ( PI / 180.0f );
+		mat3 mat = identity();
+		mat[0] = { cosf( rads ), sinf( rads ), 0.0f };
+		mat[1] = { -sinf( rads ), cosf( rads ), 0.0f };
+		return mat;
 	}
 
 	mat3 mat3::translation( float x, float y ) {
-		return{
-			1.0f,	0.0f,	x,
-			0.0f,	1.0f,	y,
-			0.0f,	0.0f,	1.0f
-		};
+		mat3 mat = identity();
+		mat[2][0] = x;
+		mat[2][1] = y;
+		return mat;
 	}
 
 	mat3 mat3::translation( const vec2& trans ) {
@@ -71,11 +74,10 @@ namespace matth {
 	}
 
 	mat3 mat3::scale( float x, float y ) {
-		return{
-			x,		0.0f,	0.0f,
-			0.0f,	y,		0.0f,
-			0.0f,	0.0f,	1.0f
-		};
+		mat3 mat = identity();
+		mat[0][0] = x;
+		mat[1][1] = y;
+		return mat;
 	}
 
 	mat3 mat3::scale( const vec2& s ) {
@@ -129,29 +131,30 @@ namespace matth {
 		return rhs * val;
 	}
 
-	mat3 operator*( const mat3& lhs, mat3& rhs ) {
+	mat3 operator*( const mat3& lhs, const mat3& rhs ) {
 		return mat3( lhs ) *= rhs;
 	}
 
 	mat3& operator*=( mat3& lhs, const mat3& rhs ) {
 		mat3 trans = lhs.transpose();
-		lhs = { dot( trans[0], rhs[0] ), 
-			dot( trans[0], rhs[1] ),
-			dot( trans[0], rhs[2] ),
-
-			dot( trans[1], rhs[0] ),
-			dot( trans[1], rhs[1] ),
-			dot( trans[1], rhs[2] ),
-
-			dot( trans[2], rhs[0] ),
-			dot( trans[2], rhs[1] ),
-			dot( trans[2], rhs[2] ),
-		};
+		lhs[0] = { dot( trans[0], rhs[0] ), dot( trans[1], rhs[0] ), dot( trans[2], rhs[0] ) };
+		lhs[1] = { dot( trans[0], rhs[1] ), dot( trans[1], rhs[1] ), dot( trans[2], rhs[1] ) };
+		lhs[2] = { dot( trans[0], rhs[2] ), dot( trans[1], rhs[2] ), dot( trans[2], rhs[2] ) };
 		return lhs;
 	}
 
 	vec3 operator*( const mat3& lhs, const vec3& rhs ) {
 		mat3 trans = lhs.transpose();
-		return { dot( trans[0], rhs ), dot( trans[1], rhs ),dot( trans[2], rhs ) };
+		return{ dot( trans[0], rhs ), dot( trans[1], rhs ),dot( trans[2], rhs ) };
+	}
+
+	std::ostream& operator<<( std::ostream& os, const mat3& rhs ) {
+		for ( int i = 0; i < 3; ++i ) {
+			for ( int j = 0; j < 3; ++j ) {
+				os << rhs.c[j][i] << " ";
+			}
+			os << std::endl;
+		}
+		return os;
 	}
 };

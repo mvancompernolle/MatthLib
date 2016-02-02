@@ -3,15 +3,13 @@
 #define MAT3_H
 
 #include "vec3.h"
+#include <iostream>
 
 namespace matth {
 
-	_declspec( align( 32 ) ) struct mat3 {
+	struct mat3 {
 		union {
 			vec3 c[3];
-			float d[9];
-			float d2d[3][3];
-
 			struct {
 				union { vec3 c1; vec2 right; };
 				union { vec3 c2; vec2 up; };
@@ -24,6 +22,7 @@ namespace matth {
 		mat3 inverse() const;
 		mat3 transpose() const;
 		float determinant() const;
+		operator float*( );
 
 		static mat3 identity();
 		static mat3 zero();
@@ -45,6 +44,7 @@ namespace matth {
 	mat3 operator*( const mat3& lhs, const mat3& rhs );
 	mat3& operator*=( mat3& lhs, const mat3& rhs );
 	vec3 operator*( const mat3& lhs, const vec3& rhs );
+	std::ostream& operator<<( std::ostream& os, const mat3& rhs );
 };
 
 

@@ -6,7 +6,7 @@
 
 namespace matth {
 
-	_declspec(align(32)) struct vec3 {
+	struct vec3 {
 		union {
 			struct { float x, y, z; };
 			struct { float r, g, b; };

@@ -4,9 +4,10 @@
 
 #include "vec3.h"
 
+
 namespace matth {
 
-	_declspec( align( 32 ) ) struct vec4 {
+	struct vec4 {
 		union {
 			struct { float x, y, z, w; };
 			struct { vec3 xyz; };
