@@ -4,7 +4,8 @@
 namespace matth {
 
 	vec2 vec2::fromAngle( float angle ) {
-		return{ cos( ( angle * PI ) / 180.0f ), sin( ( angle*PI ) / 180.0f ) };
+		const float rads = angle * PI / 180.0f;
+		return{ cos( rads ), sin( rads ) };
 	}
 
 	const float& vec2::operator[]( int pos ) const {

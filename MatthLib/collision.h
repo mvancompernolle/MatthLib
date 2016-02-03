@@ -8,8 +8,11 @@ namespace matth {
 
 	struct CollisionData {
 		bool wasCollision;
-		float depth;
-		vec2 normal;
+		vec2 mvt;
+
+		CollisionData( bool c = false, const vec2& d = { 0.0f, 0.0f } )
+			: wasCollision( c ), mvt( d ) {
+		}
 	};
 
 	float pointPlanDist( const vec2& point, const plane& plane );
