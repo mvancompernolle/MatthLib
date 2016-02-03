@@ -162,13 +162,13 @@ namespace matth {
 			if ( abs( denom ) < FLT_EPSILON ) {
 				continue;
 			}
-			float distToPlane1 = ( dot( slabs[i].normal, b.pos - slabs[i].pos ) ) / denom;
-			float distToPlane2 = ( dot( slabs[i+1].normal, b.pos - slabs[i+1].pos ) ) / denom;
+			const float distToPlane1 = ( dot( slabs[i].normal, b.pos - slabs[i].pos ) ) / denom;
+			const float distToPlane2 = ( dot( slabs[i+1].normal, b.pos - slabs[i+1].pos ) ) / denom;
 			slabMinMax[i % 2].x = matth::min( distToPlane1, distToPlane2 );
 			slabMinMax[i % 2].y = matth::max( distToPlane1, distToPlane2 );
 		}
 		// get overall min and max distances
-		const float min = matth::min(slabMinMax[0].x, slabMinMax[1].x), max = matth::max( slabMinMax[0].y, slabMinMax[1].y );
+		const float min = matth::max(slabMinMax[0].x, slabMinMax[1].x), max = matth::min( slabMinMax[0].y, slabMinMax[1].y );
 		return min <= max && 0 <= min <= b.len;
 	}
 
@@ -182,7 +182,7 @@ namespace matth {
 
 	bool collTestCircleRay( const circle& a, const ray& b ) {
 		vec2 pc = b.pos + b.dir * clamp( dot( ( a.pos - b.pos ), b.dir ), 0.0f, b.len );
-		return pow( a.pos.x - pc.x, 2 ) + pow( a.pos.y - pc.y, 2 ) < a.radius;
+		return pow( a.pos.x - pc.x, 2 ) + pow( a.pos.y - pc.y, 2 ) <= a.radius * a.radius;
 	}
 
 	bool collTestRayPlane( const ray& a, const plane& b ) {
@@ -248,7 +248,45 @@ namespace matth {
 	}
 
 	CollisionData mtvAABBRay( const aabb& a, const ray& b ) {
-		return CollisionData();
+		CollisionData cData = { false };
+		const plane slabs[4] = {
+			{ a.min(),{ 0.0f, -1.0f } },
+			{ a.max(),{ 0.0f, 1.0f } },
+			{ a.min(),{ -1.0f, 0.0f } },
+			{ a.max(),{ 1.0f, 0.0f } }
+		};
+		float slabMins[2];
+		float slabMaxs[2];
+
+		for ( int i = 0; i < 4; i += 2 ) {
+			slabMins[i] = { INFINITY };
+			slabMaxs[i] = { -INFINITY };
+			float denom = -( dot( slabs[i].normal, b.dir ) );
+			// check to see if ray is parallel to slab
+			if ( abs( denom ) < FLT_EPSILON ) {
+				continue;
+			}
+			const float distToPlane1 = ( dot( slabs[i].normal, b.pos - slabs[i].pos ) ) / denom;
+			const float distToPlane2 = ( dot( slabs[i + 1].normal, b.pos - slabs[i + 1].pos ) ) / denom;
+			slabMins[i % 2] = matth::min( distToPlane1, distToPlane2 );
+			slabMaxs[i % 2] = matth::max( distToPlane1, distToPlane2 );
+		}
+		// get overall min and max distances
+		const float min = matth::max( slabMins[0], slabMins[1] ), max = matth::min( slabMaxs[0], slabMaxs[1] );
+		// if min > 0, ray starts outside and is entering box, otherwise it starts inside box and is exiting
+		if ( min <= max && ( 0.0f <= min && min <= b.len ) ) {
+			vec2 normal = {0.0f, 0.0f};
+			float dist = clamp( min, 0.0f, b.len );
+			if ( slabMins[1] > slabMins[0] ) {
+				normal.x = -b.dir.x;
+			}
+			else {
+				normal.y = -b.dir.y;
+			}
+			cData.wasCollision = true;
+			cData.mvt = normal * dist;
+		}
+		return cData;
 	}
 
 	CollisionData mtvCircle( const circle& a, const circle& b ) {
@@ -271,7 +309,16 @@ namespace matth {
 	}
 
 	CollisionData mtvCircleRay( const circle& a, const ray& b ) {
-		return CollisionData();
+		CollisionData cData = { false };
+		const vec2 closestPoint = b.pos + b.dir * clamp( dot( ( a.pos - b.pos ), b.dir ), 0.0f, b.len );
+		const vec2 distVec = closestPoint - b.pos;
+		const float distSquared = pow( a.pos.x - closestPoint.x, 2 ) + pow( a.pos.y - closestPoint.y, 2 );
+		const float radSquared = a.radius * a.radius;
+		if ( distSquared <= radSquared ) {
+			cData.wasCollision = true;
+			cData.mvt = (a.radius - distVec.length()) * distVec.normal();
+		}
+		return cData;
 	}
 
 	CollisionData mtvRayPlane( const ray& a, const plane& b ) {
