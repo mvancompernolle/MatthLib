@@ -15,32 +15,33 @@ namespace matth {
 		}
 	};
 
-	float pointPlanDist( const vec2& point, const plane& plane );
-	float rayPlaneDist( const ray& ray, const plane& plane );
+	float pointPlanDist( const vec2& point, const Plane& plane );
+	float RayPlaneDist( const Ray& ray, const Plane& plane );
 
-	CollisionData satHull( const ConvexHull& a, const ConvexHull& b );
-	CollisionData satHullCircle( const ConvexHull& a, const circle& b );
-	CollisionData satHullRay( const ConvexHull& a, const ray& b );
-	CollisionData satHullPlane( const ConvexHull& a, const plane& b );
-	CollisionData satHullAABB( const ConvexHull& a, const aabb& b );
+	CollisionData collisionTest( const ConvexHull& a, const ConvexHull& b );
+	CollisionData collisionTest( const ConvexHull& a, const Circle& b );
+	inline CollisionData collisionTest( const Circle& a, const ConvexHull& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const ConvexHull& a, const Ray& b );
+	inline CollisionData collisionTest( const Ray& a, const ConvexHull& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const ConvexHull& a, const Plane& b );
+	inline CollisionData collisionTest( const Plane& a, const ConvexHull& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const ConvexHull& a, const AABB& b );
+	inline CollisionData collisionTest( const AABB& a, const ConvexHull& b ) { collisionTest( b, a ); }
 
-	bool collTestAABB( const aabb& a, const aabb& b );
-	bool collTestAABBCircle( const aabb& a, const circle& b );
-	bool collTestAABBPlane( const aabb& a, const plane& b );
-	bool collTestAABBRay( const aabb& a, const ray& b );
-	bool collTestCircle( const circle& a, const circle& b );
-	bool collTestCirclePlane( const circle& a, const plane& b );
-	bool collTestCircleRay( const circle& a, const ray& b );
-	bool collTestRayPlane( const ray& a, const plane& b );
-
-	CollisionData mtvAABB( const aabb& a, const aabb& b );
-	CollisionData mtvAABBCircle( const aabb& a, const circle& b );
-	CollisionData mtvAABBPlane( const aabb& a, const plane& b );
-	CollisionData mtvAABBRay( const aabb& a, const ray& b );
-	CollisionData mtvCircle( const circle& a, const circle& b );
-	CollisionData mtvCirclePlane( const circle& a, const plane& b );
-	CollisionData mtvCircleRay( const circle& a, const ray& b );
-	CollisionData mtvRayPlane( const ray& a, const plane& b );
+	CollisionData collisionTest( const AABB& a, const AABB& b );
+	CollisionData collisionTest( const AABB& a, const Circle& b );
+	inline CollisionData collisionTest( const Circle& a, const AABB& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const AABB& a, const Plane& b );
+	inline CollisionData collisionTest( const Plane& a, const AABB& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const AABB& a, const Ray& b );
+	inline CollisionData collisionTest( const Ray& a, const AABB& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const Circle& a, const Circle& b );
+	CollisionData collisionTest( const Circle& a, const Plane& b );
+	inline CollisionData collisionTest( const Plane& a, const Circle& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const Circle& a, const Ray& b );
+	inline CollisionData collisionTest( const Ray& a, const Circle& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const Ray& a, const Plane& b );
+	inline CollisionData collisionTest( const Plane& a, const Ray& b ) { return collisionTest( b, a ); }
 
 	template<class T>
 	T min( const T& a, const T& b ) {

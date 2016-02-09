@@ -10,7 +10,7 @@ namespace matth {
 		union {
 			struct { float x, y, z; };
 			struct { float r, g, b; };
-			struct { vec2 xy; };
+			vec2 xy;
 			float v[3];
 		};
 

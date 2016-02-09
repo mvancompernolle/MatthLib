@@ -4,14 +4,14 @@
 
 namespace matth {
 
-	float pointPlanDist( const vec2& point, const plane& plane ) {
-		return 0.0f;
+	float pointPlanDist( const vec2& point, const Plane& plane ) {
+		return dot(plane.normal, (point - plane.pos));
 	}
-	float rayPlaneDist( const ray& ray, const plane& plane ) {
-		return 0.0f;
+	float RayPlaneDist( const Ray& ray, const Plane& plane ) {
+		return dot( plane.normal, ray.pos - plane.pos ) / -dot(plane.normal, ray.dir);
 	}
 
-	CollisionData satHull( const ConvexHull& a, const ConvexHull& b ) {
+	CollisionData collisionTest( const ConvexHull& a, const ConvexHull& b ) {
 		CollisionData collision = { false };
 		float depth = INFINITY;
 		std::vector<vec2> axes;
@@ -52,7 +52,7 @@ namespace matth {
 		return collision;
 	}
 
-	CollisionData satHullCircle( const ConvexHull& a, const circle& b ) {
+	CollisionData collisionTest( const ConvexHull& a, const Circle& b ) {
 		CollisionData collision = { false };
 		float depth = INFINITY;
 		std::vector<float> pDepths;
@@ -84,15 +84,15 @@ namespace matth {
 		return collision;
 	}
 
-	CollisionData satHullRay( const ConvexHull& a, const ray& b ) {
+	CollisionData collisionTest( const ConvexHull& a, const Ray& b ) {
 		return CollisionData();
 	}
 
-	CollisionData satHullPlane( const ConvexHull& a, const plane& b ) {
+	CollisionData collisionTest( const ConvexHull& a, const Plane& b ) {
 		return CollisionData();
 	}
 
-	CollisionData satHullAABB( const ConvexHull& a, const aabb& b ) {
+	CollisionData collisionTest( const ConvexHull& a, const AABB& b ) {
 		CollisionData collision = { false };
 		float depth = INFINITY;
 		std::vector<vec2> axes;
@@ -132,68 +132,7 @@ namespace matth {
 		return collision;
 	}
 
-	bool collTestAABB( const aabb& a, const aabb& b ) {
-		return !( a.max().x < b.min().x || b.max().x < a.min().x || a.max().y < b.min().y || b.max().y < a.min().y );
-	}
-
-	bool collTestAABBCircle( const aabb& a, const circle& b ) {
-		vec2 point = { clamp( b.pos.x, a.min().x, a.max().x ), clamp( b.pos.y, a.min().y, a.max().y ) };
-		return pow( b.pos.x - point.x, 2 ) + pow( b.pos.y - point.y, 2 ) <= pow( b.radius, 2 );
-	}
-
-	bool collTestAABBPlane( const aabb& a, const plane& b ) {
-		return dot( b.normal, a.pos - b.pos )
-			<= a.hExtents.x * abs( dot( b.normal, { 1.0f, 0.0f } ) ) + a.hExtents.y * abs( dot( b.normal, { 0.0f, 1.0f } ) );
-	}
-
-	bool collTestAABBRay( const aabb& a, const ray& b ) {
-		const plane slabs[4] = {
-			{ a.min(), {0.0f, -1.0f} },
-			{ a.max(),{ 0.0f, 1.0f } },
-			{ a.min(),{ -1.0f, 0.0f } },
-			{ a.max(),{ 1.0f, 0.0f } }
-		};
-		vec2 slabMinMax[2];
-
-		for ( int i = 0; i < 4; i+=2 ) {
-			slabMinMax[i] = { INFINITY, -INFINITY };
-			float denom = -( dot( slabs[i].normal, b.dir ) );
-			// check to see if ray is parallel to slab
-			if ( abs( denom ) < FLT_EPSILON ) {
-				continue;
-			}
-			const float distToPlane1 = ( dot( slabs[i].normal, b.pos - slabs[i].pos ) ) / denom;
-			const float distToPlane2 = ( dot( slabs[i+1].normal, b.pos - slabs[i+1].pos ) ) / denom;
-			slabMinMax[i % 2].x = matth::min( distToPlane1, distToPlane2 );
-			slabMinMax[i % 2].y = matth::max( distToPlane1, distToPlane2 );
-		}
-		// get overall min and max distances
-		const float min = matth::max(slabMinMax[0].x, slabMinMax[1].x), max = matth::min( slabMinMax[0].y, slabMinMax[1].y );
-		return min <= max && 0 <= min <= b.len;
-	}
-
-	bool collTestCircle( const circle& a, const circle& b ) {
-		return pow( a.pos.x - b.pos.x, 2 ) + pow( a.pos.y - b.pos.y, 2 ) <= pow( a.radius + b.radius, 2 );
-	}
-
-	bool collTestCirclePlane( const circle& a, const plane& b ) {
-		return dot( b.normal, ( a.pos - b.pos ) ) <= a.radius;
-	}
-
-	bool collTestCircleRay( const circle& a, const ray& b ) {
-		vec2 pc = b.pos + b.dir * clamp( dot( ( a.pos - b.pos ), b.dir ), 0.0f, b.len );
-		return pow( a.pos.x - pc.x, 2 ) + pow( a.pos.y - pc.y, 2 ) <= a.radius * a.radius;
-	}
-
-	bool collTestRayPlane( const ray& a, const plane& b ) {
-		if ( -dot( b.normal, a.dir ) > 0 ) {
-			const float rayPlanDistance = dot( b.normal, vec2{a.pos - b.pos} ) / -dot(b.normal, a.dir);
-			return ( 0.0f <= rayPlanDistance && rayPlanDistance <= a.len );
-		}
-		return false;
-	}
-
-	CollisionData mtvAABB( const aabb& a, const aabb& b ) {
+	CollisionData collisionTest( const AABB& a, const AABB& b ) {
 		CollisionData cData = { false };
 		const float left = b.min().x - a.max().x;
 		const float right = b.max().x - a.min().x;
@@ -209,7 +148,7 @@ namespace matth {
 		return cData;
 	}
 
-	CollisionData mtvAABBCircle( const aabb& a, const circle& b ) {
+	CollisionData collisionTest( const AABB& a, const Circle& b ) {
 		CollisionData cData = { false };
 		vec2 point = { clamp( b.pos.x, a.min().x, a.max().x ), clamp( b.pos.y, a.min().y, a.max().y ) };
 		const float distSquared = pow( b.pos.x - point.x, 2 ) + pow( b.pos.y - point.y, 2 );
@@ -236,7 +175,7 @@ namespace matth {
 		return cData;
 	}
 
-	CollisionData mtvAABBPlane( const aabb& a, const plane& b ) {
+	CollisionData collisionTest( const AABB& a, const Plane& b ) {
 		CollisionData cData = { false };
 		const float distToPlane = dot( b.normal, a.pos - b.pos );
 		const float projExtents = a.hExtents.x * abs( dot( b.normal, { 1.0f, 0.0f } ) ) + a.hExtents.y * abs( dot( b.normal, { 0.0f, 1.0f } ) );
@@ -247,9 +186,9 @@ namespace matth {
 		return cData;
 	}
 
-	CollisionData mtvAABBRay( const aabb& a, const ray& b ) {
+	CollisionData collisionTest( const AABB& a, const Ray& b ) {
 		CollisionData cData = { false };
-		const plane slabs[4] = {
+		const Plane slabs[4] = {
 			{ a.min(),{ 0.0f, -1.0f } },
 			{ a.max(),{ 0.0f, 1.0f } },
 			{ a.min(),{ -1.0f, 0.0f } },
@@ -262,7 +201,7 @@ namespace matth {
 			slabMins[i] = { INFINITY };
 			slabMaxs[i] = { -INFINITY };
 			float denom = -( dot( slabs[i].normal, b.dir ) );
-			// check to see if ray is parallel to slab
+			// check to see if Ray is parallel to slab
 			if ( abs( denom ) < FLT_EPSILON ) {
 				continue;
 			}
@@ -273,7 +212,7 @@ namespace matth {
 		}
 		// get overall min and max distances
 		const float min = matth::max( slabMins[0], slabMins[1] ), max = matth::min( slabMaxs[0], slabMaxs[1] );
-		// if min > 0, ray starts outside and is entering box, otherwise it starts inside box and is exiting
+		// if min > 0, Ray starts outside and is entering box, otherwise it starts inside box and is exiting
 		if ( min <= max && ( 0.0f <= min && min <= b.len ) ) {
 			vec2 normal = {0.0f, 0.0f};
 			float dist = clamp( min, 0.0f, b.len );
@@ -289,16 +228,18 @@ namespace matth {
 		return cData;
 	}
 
-	CollisionData mtvCircle( const circle& a, const circle& b ) {
+	CollisionData collisionTest( const Circle& a, const Circle& b ) {
+		CollisionData cData = { false };
 		const float distSquared = pow( a.pos.x - b.pos.x, 2 ) + pow( a.pos.y - b.pos.y, 2 );
 		const float radSquared = pow( a.radius + b.radius, 2 );
 		if ( distSquared <= radSquared ) {
-			return	CollisionData{ true, (sqrt( radSquared ) - sqrt( distSquared )) * ( a.pos - b.pos ).normal() };
+			cData.wasCollision = true;
+			cData.mvt = ( ( a.radius + b.radius ) - sqrt( distSquared ) ) * ( a.pos - b.pos ).normal();
 		}
-		return CollisionData{ false };
+		return cData;
 	}
 
-	CollisionData mtvCirclePlane( const circle& a, const plane& b ) {
+	CollisionData collisionTest( const Circle& a, const Plane& b ) {
 		CollisionData cData = { false };
 		const float distToPlane = dot( b.normal, ( a.pos - b.pos ) );
 		if ( distToPlane <= a.radius || distToPlane < 0.0f ) {
@@ -308,7 +249,7 @@ namespace matth {
 		return cData;
 	}
 
-	CollisionData mtvCircleRay( const circle& a, const ray& b ) {
+	CollisionData collisionTest( const Circle& a, const Ray& b ) {
 		CollisionData cData = { false };
 		const vec2 closestPoint = b.pos + b.dir * clamp( dot( ( a.pos - b.pos ), b.dir ), 0.0f, b.len );
 		const vec2 distVec = closestPoint - b.pos;
@@ -321,15 +262,15 @@ namespace matth {
 		return cData;
 	}
 
-	CollisionData mtvRayPlane( const ray& a, const plane& b ) {
-		// gets the shortest vector to move out of collision with plane
+	CollisionData collisionTest( const Ray& a, const Plane& b ) {
+		// gets the shortest vector to move out of collision with Plane
 		CollisionData cData = { false };
 		const float dotVal = dot( b.normal, a.dir );
 		if ( -dotVal > 0.0f ) {
-			const float rayPlanDistance = dot( b.normal, vec2{ a.pos - b.pos } ) / -dotVal;
-			if ( 0.0f <= rayPlanDistance && rayPlanDistance <= a.len ) {
+			const float RayPlanDistance = dot( b.normal, vec2{ a.pos - b.pos } ) / -dotVal;
+			if ( 0.0f <= RayPlanDistance && RayPlanDistance <= a.len ) {
 				cData.wasCollision = true;
-				cData.mvt = -b.normal * ( a.len - rayPlanDistance );
+				cData.mvt = -b.normal * ( a.len - RayPlanDistance );
 			}
 		}
 		return cData;

@@ -4,6 +4,7 @@
 #define COLLISION_SHAPES_H
 
 #include "vec2.h"
+#include "mat3.h"
 #include <vector>
 
 namespace matth {
@@ -12,21 +13,21 @@ namespace matth {
 		std::vector<vec2> verts;
 	};
 
-	struct ray {
+	struct Ray {
 		vec2 pos, dir;
 		float len;
 	};
 
-	struct plane {
+	struct Plane {
 		vec2 pos, normal;
 	};
 
-	struct circle {
+	struct Circle {
 		vec2 pos;
 		float radius;
 	};
 
-	struct aabb {
+	struct AABB {
 		vec2 pos;
 		vec2 hExtents;
 		vec2 min() const {
@@ -36,6 +37,12 @@ namespace matth {
 			return pos + hExtents;
 		}
 	};
+
+	Circle operator*( const mat3& m, const Circle& a );
+	AABB operator*( const mat3& m, const AABB& a );
+	Ray operator*( const mat3& m, const Ray& a );
+	Plane operator*( const mat3& m, const Plane& a );
+	ConvexHull operator*( const mat3& m, const ConvexHull& a );
 }
 
 #endif // COLLISION_SHAPES_H
