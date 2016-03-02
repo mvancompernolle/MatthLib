@@ -6,7 +6,7 @@ namespace matth {
 	Circle operator*( const mat3& m, const Circle& a ) {
 		Circle circle;
 		circle.pos = ( m * vec3{ a.pos.x, a.pos.y, 1.0f } ).xy;
-		circle.radius = max( ( m * vec3{ a.radius, 0.0f, 0.0f } ).length(), ( m * vec3{ 0.0f, a.radius, 0.0f } ).length() );
+		circle.radius = fmaxf( ( m * vec3{ a.radius, 0.0f, 0.0f } ).length(), ( m * vec3{ 0.0f, a.radius, 0.0f } ).length() );
 		return circle;
 	}
 
@@ -28,25 +28,24 @@ namespace matth {
 				rMax[j] += q;
 			}
 		}
-		aabb.pos = { ( rMin + rMax ) / 2.00f };
-		aabb.hExtents = { ( rMax - rMin ) / 2.00f };
+		aabb.pos = { ( rMin + rMax ) / 2.0f };
+		aabb.hExtents = { ( rMax - rMin ) / 2.0f };
 		return aabb;
 	}
 	Ray operator*( const mat3& m, const Ray& a ) {
-		Ray ray = {};
-		vec3 dir{a.dir.x, a.dir.y, 0.0f};
+		Ray ray;
+		vec3 dir{ a.dir.x, a.dir.y, 0.0f };
 		vec3 pos{ a.pos.x, a.pos.y, 1.0f };
 		dir = dir * a.len;
-		ray = {(m * pos).xy, (m * dir).xy};
+		ray = { ( m * pos ).xy, ( m * dir ).xy };
 		ray.len = ray.dir.length();
 		ray.dir = ray.dir.normal();
 		return ray;
 	}
 	Plane operator*( const mat3& m, const Plane& a ) {
-		Plane plane;
-		plane.pos = ( m * vec3{ a.pos.x, a.pos.y, 1.0f } ).xy;
-		plane.normal = ( m.transpose().inverse() * vec3 { a.normal.x, a.normal.y, 0.0f } ).xy;
-		return plane;
+		const vec3 nor{ a.normal.x, a.normal.y, 0.0f };
+		const vec3 pos{ a.pos.x, a.pos.y, 1.0f };
+		return{ ( m * pos ).xy, ( m*nor ).xy };
 	}
 	ConvexHull operator*( const mat3& m, const ConvexHull& a ) {
 		ConvexHull hull;

@@ -175,6 +175,14 @@ namespace matth {
 				mat3[6], mat3[7], 0.0f, mat3[8]};
 	}
 
+	bool operator==( const mat4& lhs, const mat4& rhs ) {
+		return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2] && lhs[3] == rhs[3];
+	}
+
+	bool operator!=( const mat4& lhs, const mat4& rhs ) {
+		return !( lhs == rhs );
+	}
+
 	mat4 operator+( const mat4& lhs, const mat4& rhs ) {
 		return mat4( lhs ) += rhs;
 	}

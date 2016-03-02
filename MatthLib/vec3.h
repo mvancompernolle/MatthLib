@@ -13,6 +13,8 @@ namespace matth {
 			vec2 xy;
 			float v[3];
 		};
+		//vec3(const vec2& xy, float z) : xy(xy), z(z) {}
+		//vec3( float x = 0.0f, float y = 0.0f, float z = 0.0f ) : x( x ), y( y ), z( z ) {}
 
 		// offset opeartors
 		const float& operator[]( int pos ) const;

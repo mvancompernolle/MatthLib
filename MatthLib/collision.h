@@ -43,6 +43,28 @@ namespace matth {
 	CollisionData collisionTest( const Ray& a, const Plane& b );
 	inline CollisionData collisionTest( const Plane& a, const Ray& b ) { return collisionTest( b, a ); }
 
+	// use reflection of static resolution test
+	// dynamic resolution test
+	/*
+	staticResolution(rigidbody, collisionData)
+	dyanmicResolution(rigidbody, rigidbody, collisionData)
+	m1v1f + m2v2f = m2v2i + m1v1i
+	v1f - v2f = v2i - v1i or [v1f - v2f = v2i - v1i]
+
+	m1v1f + m2v2f = m2v2i + m1v1i
+	-m1v1f + m1v2f = -m1v2i + m1v1i
+	+ --------------------------------
+	m2v2f + m1v2f = m2v2i - m1v2i + 2(m1v1i)
+
+	v2f(m2 + m1) = v2i(m2 - m1)  + 2(m1v1i)
+	v2f = [v2i(m2 - m1)  + 2(m1v1i)]/(m2+m1)
+	// v2f now known
+
+	v1f - v2f = v2i - v1i
+	v1f = v2i - v1i + v2f
+	// v1f now known
+	*/
+
 	template<class T>
 	T min( const T& a, const T& b ) {
 		return ( a < b ? a : b );

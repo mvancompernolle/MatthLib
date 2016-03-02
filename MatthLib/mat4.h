@@ -42,6 +42,9 @@ namespace matth {
 		static mat4 mat3ToMat4( float* mat3 );
 	};
 
+	bool operator==( const mat4& lhs, const mat4& rhs );
+	bool operator!=( const mat4& lhs, const mat4& rhs );
+
 	mat4 operator+( const mat4& lhs, const mat4& rhs );
 	mat4 operator-( const mat4& lhs, const mat4& rhs );
 	mat4& operator+=( mat4& lhs, const mat4& rhs );

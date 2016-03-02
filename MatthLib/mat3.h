@@ -33,6 +33,10 @@ namespace matth {
 		static mat3 scale( const vec2& s );
 
 	};
+
+	bool operator==( const mat3& lhs, const mat3& rhs );
+	bool operator!=( const mat3& lhs, const mat3& rhs );
+
 	mat3 operator+( const mat3& lhs, const mat3& rhs );
 	mat3 operator-( const mat3& lhs, const mat3& rhs );
 	mat3& operator+=( mat3& lhs, const mat3& rhs );

@@ -14,7 +14,10 @@ namespace matth {
 		mat3 matrix = mat3::zero();
 		float det = determinant();
 		if ( det != 0.0f ) {
-			return ( 1.0f / determinant() ) * transpose();
+			matrix[0] = {c[1][1]*c[2][2] - c[2][1]*c[1][2], c[2][1]*c[0][2] - c[0][1]*c[2][2], c[0][1] * c[1][2] - c[1][1] * c[0][2]};
+			matrix[1] = { c[2][0] * c[1][2] - c[1][0] * c[2][2], c[0][0] * c[2][2] - c[2][0] * c[0][2], c[1][0] * c[0][2] - c[0][0] * c[1][2] };
+			matrix[2] = { c[1][0] * c[2][1] - c[2][0] * c[1][1], c[2][0] * c[0][1] - c[0][0] * c[2][1], c[0][0] * c[1][1] - c[1][0] * c[0][1] };
+			return ( 1.0f / determinant() * matrix );
 		}
 		return matrix;
 
@@ -31,7 +34,7 @@ namespace matth {
 	}
 
 	float mat3::determinant() const {
-		return c[0][0] * ( c[1][1] * c[2][2] - c[1][2] * c[2][1] ) +
+		return c[0][0] * ( c[1][1] * c[2][2] - c[1][2] * c[2][1] ) -
 			c[1][0] * ( c[0][1] * c[2][2] - c[2][1] * c[0][2] ) +
 			c[2][0] * ( c[0][1] * c[1][2] - c[1][1] * c[0][2] );
 
@@ -82,6 +85,14 @@ namespace matth {
 
 	mat3 mat3::scale( const vec2& s ) {
 		return scale( s.x, s.y );
+	}
+
+	bool operator==( const mat3& lhs, const mat3& rhs ) {
+		return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2];
+	}
+
+	bool operator!=( const mat3& lhs, const mat3& rhs ) {
+		return !( lhs == rhs );
 	}
 
 	mat3 operator+( const mat3& lhs, const mat3& rhs ) {
