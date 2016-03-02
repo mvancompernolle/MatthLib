@@ -1,37 +1,39 @@
 #include <iostream>
 #include <cassert>
-#include "vec2.h"
-#include "mat4.h"
-#include "sfwdraw.h"
-#include "Transform.h"
-#include "RigidBody.h"
-#include "collision.h"
-#include "renderutils.h"
 #include "Window.h"
 #include "Input.h"
 #include "Time.h"
-#include "Rigidbody.h"
-#include "Entity.h"
-using namespace matth;
+#include "Factory.h"
+#include "DebugDraw.h"
+#include "RigidBodyDynamics.h"
 
 int main() {
-	int r = RigidBody::make();
-	int t = RigidBody::make();
-
-	auto e = Entity::make();
-
-	auto& time = Time::instance();
 	auto& window = Window::instance();
 	auto& input = Input::instance();
-	Window::instance().initialize();
+	auto& time = Time::instance();
+
 	window.initialize();
 	input.initialize();
+	time.initialize();
+
+	Factory::makeBall( { 40,  40 }, { 10,10 }, 400, 40 );
+	Factory::makeBall( { 70,  70 }, { 40,40 }, 120, 12 );
+	Factory::makeBall( { 80, 200 }, { 0,100 }, 280, 200 );
+
+	DebugDraw debugDrawSystem;
+	RigidBodyDynamics rigidBodySystem;
+
 	while ( window.update() ) {
 		input.update();
 		time.update();
+
+		debugDrawSystem.step();
+		//rigidBodySystem.step();
 	}
+
+	time.terminate();
+	input.terminate();
 	window.terminate();
-	return 0;
 }
 
 //matth::mat3 matrix;

@@ -9,17 +9,23 @@ struct Handle {
 	Handle( int index = -1 ) : index{ index } {}
 
 	T* operator->() {
-		&GCData<T>::at( index );
+		return &GCData<T>::at( index );
 	}
 	T* operator->() const{
-		&GCData<T>::at( index );
+		return &GCData<T>::at( index );
 	}
-	T& operator*() {
-		&GCData<T>::at( index );
+
+	T operator*() {
+		return GCData<T>::at( index );
 	}
-	T& operator*() const {
-		&GCData<T>::at( index );
+	T operator*() const {
+		return GCData<T>::at( index );
 	}
+
+	T* operator&() const {
+		return &GCData<T>::at( index );
+	}
+
 
 	operator int() {
 		return index;

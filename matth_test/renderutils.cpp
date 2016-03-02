@@ -58,7 +58,7 @@ void drawRay( const matth::Ray& r ) {
 }
 
 void drawTransform( const Transform& transform ) {
-	drawMatrix( transform.getGlobalTransform(), 0 );
+	drawMatrix( transform.getGlobalTransform() * matth::mat3::scale(30.0f, 30.0f), 0 );
 }
 
 void drawRigidBody( const Transform& transform, const RigidBody& rbody ) {
@@ -67,7 +67,7 @@ void drawRigidBody( const Transform& transform, const RigidBody& rbody ) {
 	matth::vec2 vel = pos + rbody.vel;
 
 	sfw::drawLine(pos.x, pos.y, acc.x, acc.y, CYAN );
-	sfw::drawLine( pos.x, pos.y, vel.x, vel.y, BLUE );
+	sfw::drawLine( pos.x, pos.y, vel.x, vel.y, YELLOW );
 }
 
 void drawCollider( const Transform& transform, const Collider& collider ) {

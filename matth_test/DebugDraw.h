@@ -10,9 +10,11 @@ public:
 
 	virtual void update( Handle<Entity> i ) {
 		drawTransform( *( i->transform ) );
-		if ( i->collider > 0 )
+
+		if ( i->collider > -1 )
 			drawCollider( *( i->transform ), *( i->collider ) );
-		if ( i->rigidbody > 0 )
+
+		if ( i->rigidbody > -1 )
 			drawRigidBody( *( i->transform ), *( i->rigidbody ) );
 	}
 };
