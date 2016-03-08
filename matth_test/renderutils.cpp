@@ -73,16 +73,16 @@ void drawRigidBody( const Transform& transform, const RigidBody& rbody ) {
 void drawCollider( const Transform& transform, const Collider& collider ) {
 	switch ( collider.shape ) {
 	case Collider::e_CIRCLE:
-		drawCircle( collider.circle );
+		drawCircle( transform.getGlobalTransform() * collider.circle );
 		break;
 	case Collider::e_RAY:
-		drawRay( collider.ray );
+		drawRay( transform.getGlobalTransform() * collider.ray );
 		break;
 	case Collider::e_AABB:
-		drawAABB( collider.aabb );
+		drawAABB( transform.getGlobalTransform() * collider.aabb );
 		break;
 	case Collider::e_PLANE:
-		drawPlane( collider.plane );
+		drawPlane( transform.getGlobalTransform() * collider.plane );
 		break;
 	default:
 		break;

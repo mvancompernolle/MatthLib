@@ -10,12 +10,44 @@ namespace matth {
 		return c[pos];
 	}
 
+	void mat4::setBlock2x2( int row, int col, mat2 a ) {
+		for ( int i = 0; i < 2; ++i ) {
+			for ( int j = 0; j < 2; ++j ) {
+				c[i + col][j + row] = a[i][j];
+			}
+		}
+	}
+
+	mat2 mat4::getBlock2x2( int row, int col ) const {
+		mat2 matrix;
+		for ( int i = 0; i < 2; ++i ) {
+			for ( int j = 0; j < 2; ++j ) {
+				matrix[i][j] = c[i + col][j + row];
+			}
+		}
+		return matrix;
+	}
+
 	mat4::operator float*( ) {
 		return (float*)c;
 	}
 
 	mat4 mat4::inverse() const {
-		return mat4();
+		const mat2 a = getBlock2x2( 0, 0 );
+		const mat2 b = getBlock2x2( 0, 2 );
+		const mat2 c = getBlock2x2( 2, 0 );
+		const mat2 d = getBlock2x2( 2, 2 );
+		const mat2 ai = a.inverse();
+		const mat2 ca = c * ai;
+		const mat2 ab = ai * b;
+		const mat2 dcab = ( d - ca *b ).inverse();
+
+		mat4 matrix;
+		matrix.setBlock2x2( 0, 0, mat2{ ai + ab * dcab * ca } );
+		matrix.setBlock2x2( 0, 2, mat2{ ( ab * -1 )*dcab } );
+		matrix.setBlock2x2( 2, 0, mat2{ ( dcab * -1 ) * ca } );
+		matrix.setBlock2x2( 2, 2, mat2{ dcab } );
+		return matrix;
 	}
 
 	mat4 mat4::transpose() const {
@@ -35,22 +67,22 @@ namespace matth {
 			c[3][1], c[3][2], c[3][3],
 		};
 		const mat3 matrix2 = {
-			c[1][0], c[1][2], c[1][3],
-			c[2][0], c[2][2], c[2][3],
-			c[3][0], c[3][2], c[3][3],
+			c[0][1], c[0][2], c[0][3],
+			c[2][1], c[2][2], c[2][3],
+			c[3][1], c[3][2], c[3][3],
 		};
 		const mat3 matrix3 = {
-			c[1][0], c[1][1], c[1][3],
-			c[2][0], c[2][1], c[2][3],
-			c[3][0], c[3][1], c[3][3],
+			c[0][1], c[0][2], c[0][3],
+			c[1][1], c[1][2], c[1][3],
+			c[3][1], c[3][2], c[3][3],
 		};
 		const mat3 matrix4 = {
-			c[1][0], c[1][1], c[1][2],
-			c[2][0], c[2][1], c[2][2],
-			c[3][0], c[3][1], c[3][2],
+			c[0][1], c[0][2], c[0][3],
+			c[1][1], c[1][2], c[1][3],
+			c[2][1], c[2][2], c[2][3],
 		};
-		return ( c[0][0] * matrix1.determinant() ) - ( c[0][1] * matrix2.determinant() )
-			+ ( c[0][2] * matrix3.determinant() ) - ( c[0][3] * matrix4.determinant() );
+		return ( c[0][0] * matrix1.determinant() ) - ( c[1][0] * matrix2.determinant() )
+			+ ( c[2][0] * matrix3.determinant() ) - ( c[3][0] * matrix4.determinant() );
 	}
 
 	mat4::operator mat3() {
@@ -82,11 +114,11 @@ namespace matth {
 		matrix[0][0] = ( x2 + ( y2 + z2 ) * cos( rads ) ) / L;
 		matrix[0][1] = ( axis.x * axis.y * ( 1 - cos( rads ) ) + axis.z * sqrt( L ) * sin( rads ) ) / L;
 		matrix[0][2] = ( axis.x * axis.z * ( 1 - cos( rads ) ) + axis.y * sqrt( L ) * sin( rads ) ) / L;
-		
+
 		matrix[1][0] = ( axis.x * axis.y * ( 1 - cos( rads ) ) - axis.z * sqrt( L ) * sin( rads ) ) / L;
 		matrix[1][1] = ( y2 + ( x2 + z2 ) * cos( rads ) ) / L;
 		matrix[1][2] = ( axis.y * axis.z * ( 1 - cos( rads ) ) + axis.x * sqrt( L ) * sin( rads ) ) / L;
-		
+
 		matrix[2][0] = ( axis.x * axis.z * ( 1 - cos( rads ) ) - axis.y * sqrt( L ) * sin( rads ) ) / L;
 		matrix[2][1] = ( axis.x * axis.y * ( 1 - cos( rads ) ) + axis.z * sqrt( L ) * sin( rads ) ) / L;
 		matrix[2][2] = ( z2 + ( x2 + y2 ) * cos( rads ) ) / L;
@@ -121,7 +153,7 @@ namespace matth {
 
 	mat4 mat4::ortho( float l, float r, float b, float t, float n, float f ) {
 		mat4 matrix = identity();
-		matrix[0] = { 2.0f / ( r - l ), 0.0f, 0.0f, 0.0f};
+		matrix[0] = { 2.0f / ( r - l ), 0.0f, 0.0f, 0.0f };
 		matrix[1] = { 0.0f, 2.0f / ( t - b ), 0.0f, 0.0f };
 		matrix[2] = { 0.0f, 0.0f, -2.0f / ( f - n ), 0.0f };
 		matrix[3] = { -( r + l ) / ( r - l ), -( t + b ) / ( t - b ), -( f + n ) / ( f - n ), 1.0f };
@@ -169,10 +201,10 @@ namespace matth {
 	}
 
 	mat4 mat4::mat3ToMat4( float* mat3 ) {
-		return{mat3[0], mat3[1], 0.0f, mat3[2],
+		return{ mat3[0], mat3[1], 0.0f, mat3[2],
 				mat3[3], mat3[4], 0.0f, mat3[5],
 				0.0f, 0.0f, 1.0f, 0.0f,
-				mat3[6], mat3[7], 0.0f, mat3[8]};
+				mat3[6], mat3[7], 0.0f, mat3[8] };
 	}
 
 	bool operator==( const mat4& lhs, const mat4& rhs ) {

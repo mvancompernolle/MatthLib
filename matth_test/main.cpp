@@ -6,6 +6,8 @@
 #include "Factory.h"
 #include "DebugDraw.h"
 #include "RigidBodyDynamics.h"
+#include "LifeTimeSystem.h"
+#include "matth.h"
 
 int main() {
 	auto& window = Window::instance();
@@ -16,19 +18,21 @@ int main() {
 	input.initialize();
 	time.initialize();
 
-	Factory::makeBall( { 40,  40 }, { 10,10 }, 400, 40 );
+	Factory::makeBall( { 40,  40 }, { 10,10 }, 400, 40, 1.0f );
 	Factory::makeBall( { 70,  70 }, { 40,40 }, 120, 12 );
-	Factory::makeBall( { 80, 200 }, { 0,100 }, 280, 200 );
+	Factory::makeBall( { 80, 200 }, { 0,100 }, 280, 200, 3.0f );
 
 	DebugDraw debugDrawSystem;
 	RigidBodyDynamics rigidBodySystem;
+	LifeTimeSystem lifeTimeSystem;
 
 	while ( window.update() ) {
 		input.update();
 		time.update();
 
 		debugDrawSystem.step();
-		//rigidBodySystem.step();
+		rigidBodySystem.step();
+		lifeTimeSystem.step();
 	}
 
 	time.terminate();

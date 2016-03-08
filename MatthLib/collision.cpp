@@ -85,11 +85,58 @@ namespace matth {
 	}
 
 	CollisionData collisionTest( const ConvexHull& a, const Ray& b ) {
-		return CollisionData();
+		CollisionData collision = { false };
+		float depth = INFINITY;
+		std::vector<vec2> axes;
+
+		for ( int i = 0; i < a.verts.size(); ++i ) {
+			const vec2 vecBetween = a.verts[i] - a.verts[( i + 1 ) % a.verts.size()];
+			axes.push_back( vecBetween.normal().perp() );
+		}
+
+		float tMin = 0.0f, tMax = 1.0f;
+
+		for ( int i = 0; i < axes.size(); ++i ) {
+			const float N = -dot( axes[i], b.pos - a.verts[i] );
+			const float D = dot( axes[i], b.dir );
+
+			if ( fabs( D ) < FLT_EPSILON ) {
+				if ( N < 0.0f ) return collision;
+			}
+
+			const float t = N / D;
+
+			if ( D < 0.0f ) {
+				if ( t > tMin ) {
+					tMin = t;
+					collision.mvt = ( ( b.dir * b.len ).length() - tMin ) * axes[i];
+					collision.wasCollision = true;
+				}
+			} 
+		}
+
+		return collision;
 	}
 
 	CollisionData collisionTest( const ConvexHull& a, const Plane& b ) {
-		return CollisionData();
+		CollisionData collision = { false };
+		float aMin = INFINITY;
+
+		// loop over vertices
+		for ( int i = 0; i < a.verts.size(); ++i ) {
+			// get points distance form the plane
+			const float pp = dot( b.normal, a.verts[i] - b.pos );
+			// keep track of min point
+			aMin = min( pp, aMin );
+		}
+
+		// if less than 0 there was an overlap
+		if ( aMin <= 0.0f ) {
+			collision.wasCollision = true;
+			collision.mvt = b.normal * aMin;
+		}
+
+		return collision;
 	}
 
 	CollisionData collisionTest( const ConvexHull& a, const AABB& b ) {
@@ -134,17 +181,21 @@ namespace matth {
 
 	CollisionData collisionTest( const AABB& a, const AABB& b ) {
 		CollisionData cData = { false };
+		// get all of the different overlaps
 		const float left = b.min().x - a.max().x;
 		const float right = b.max().x - a.min().x;
 		const float top = b.min().y - a.max().y;
 		const float bottom = b.max().y - a.min().y;
-		if ( left > 0.0f || right < 0.0f || top > 0.0f || bottom <= 0.0f ) {
+
+		if ( left > 0.0f || right < 0.0f || top > 0.0f || bottom < 0.0f ) {
 			return cData;
 		}
 
+		// there is an overlap
 		cData.mvt.x = abs( left ) < right ? left : right;
 		cData.mvt.y = abs( top ) < bottom ? top : bottom;
 		( abs( cData.mvt.x ) < abs( cData.mvt.y ) ) ? cData.mvt.y = 0.0f : cData.mvt.x = 0.0f;
+		cData.wasCollision = true;
 		return cData;
 	}
 

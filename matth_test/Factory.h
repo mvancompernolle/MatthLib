@@ -6,7 +6,7 @@
 
 struct Factory {
 
-	static Handle<Entity> makeBall( matth::vec2 pos, matth::vec2 vel, float radius, float mass ) {
+	static Handle<Entity> makeBall( matth::vec2 pos, matth::vec2 vel, float radius, float mass, float lifeTime = 0.0f ) {
 		auto e = Entity::make();
 		e->collider = Collider::make();
 		e->rigidbody = RigidBody::make();
@@ -17,6 +17,11 @@ struct Factory {
 		e->rigidbody->mass = mass;
 		e->rigidbody->vel = vel;
 		e->transform->setPos( pos );
+
+		if ( lifeTime > 0.0f ) {
+			e->lifeTime = LifeTime::make();
+			e->lifeTime->setLifeTime( lifeTime );
+		}
 		return e;
 	}
 

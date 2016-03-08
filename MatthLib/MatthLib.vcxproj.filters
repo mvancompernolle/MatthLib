@@ -36,6 +36,9 @@
     <ClCompile Include="CollisionShapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mat2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vec2.h">
@@ -63,6 +66,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="quat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="matth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mat2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

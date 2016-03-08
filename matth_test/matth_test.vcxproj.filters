@@ -57,9 +57,6 @@
     <ClCompile Include="DebugDraw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LifeTime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sfwdraw.h">
@@ -95,9 +92,6 @@
     <ClInclude Include="System.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="LifeTime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DebugDraw.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
@@ -106,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="Factory.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="LifeTime.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="LifeTimeSystem.h">
+      <Filter>Header Files\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

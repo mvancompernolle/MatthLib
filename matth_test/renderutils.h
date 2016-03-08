@@ -14,6 +14,6 @@ void drawAABB( const matth::AABB& box );
 void drawCircle( const matth::Circle& c );
 void drawRay( const matth::Ray& r );
 
-void drawTransform( const Transform& );
-void drawRigidBody( const Transform&, const RigidBody& );
-void drawCollider( const Transform&, const Collider& );
+void drawTransform( const Transform& transform);
+void drawRigidBody( const Transform& transfrom, const RigidBody& rbody );
+void drawCollider( const Transform& transform, const Collider& collider);

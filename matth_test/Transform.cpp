@@ -12,10 +12,6 @@ Transform::~Transform() {
 	setParent( nullptr );
 }
 
-/*void Transform::setLocalTransform( mat3& matrix ) {
-
-}*/
-
 matth::mat3 Transform::getGlobalTransform() const {
 	const matth::mat3 model = matth::mat3::translation( pos ) * matth::mat3::scale( scale ) * matth::mat3::rotation( angle );
 	if ( parent != nullptr ) {

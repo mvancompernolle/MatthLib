@@ -4,6 +4,7 @@
 
 #include "vec4.h"
 #include "mat3.h"
+#include "mat2.h"
 #include <iostream>
 
 namespace matth {
@@ -18,7 +19,10 @@ namespace matth {
 				union { vec4 c3; vec3 forward; };
 				union { vec4 c4; vec3 pos; };
 			};
+
 		};
+		void setBlock2x2( int row, int col, mat2 a );
+		mat2 getBlock2x2( int row, int col ) const;
 
 		const vec4& operator[]( int pos ) const;
 		vec4& operator[]( int pos );
