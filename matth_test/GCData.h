@@ -15,7 +15,7 @@ struct Handle {
 		return &GCData<T>::at( index );
 	}
 
-	T operator*() {
+	T& operator*() {
 		return GCData<T>::at( index );
 	}
 	T operator*() const {

@@ -7,8 +7,10 @@
 #include "DebugDraw.h"
 #include "RigidBodyDynamics.h"
 #include "LifeTimeSystem.h"
+#include "CollisionSystem.h"
+#include "DynamicResolution.h"
+#include "PlayerMovSystem.h"
 #include "matth.h"
-
 int main() {
 	auto& window = Window::instance();
 	auto& input = Input::instance();
@@ -18,13 +20,17 @@ int main() {
 	input.initialize();
 	time.initialize();
 
-	Factory::makeBall( { 40,  40 }, { 10,10 }, 400, 40, 1.0f );
-	Factory::makeBall( { 70,  70 }, { 40,40 }, 120, 12 );
-	Factory::makeBall( { 80, 200 }, { 0,100 }, 280, 200, 3.0f );
+
+	auto ball = Factory::makeBall( { 720,  200 }, { }, 60, 1 );
+	ball->controller = PlayerController::make();
+
 
 	DebugDraw debugDrawSystem;
 	RigidBodyDynamics rigidBodySystem;
 	LifeTimeSystem lifeTimeSystem;
+	CollisionDetection collisionSystem;
+	DynamicResolution resolutionSystem;
+	PlayerMovSystem movSystem;
 
 	while ( window.update() ) {
 		input.update();
@@ -33,6 +39,9 @@ int main() {
 		debugDrawSystem.step();
 		rigidBodySystem.step();
 		lifeTimeSystem.step();
+		collisionSystem.step();
+		movSystem.step();
+		resolutionSystem.step();
 	}
 
 	time.terminate();

@@ -11,6 +11,7 @@ struct Factory {
 		e->collider = Collider::make();
 		e->rigidbody = RigidBody::make();
 		e->transform = Transform::make();
+		e->controller = PlayerController::make();
 
 		e->collider->circle.radius = radius;
 		e->collider->shape = Collider::e_CIRCLE;
