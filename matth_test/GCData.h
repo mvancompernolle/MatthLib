@@ -41,7 +41,7 @@ template<typename T>
 class GCData {
 	int index;
 	bool isVacant;
-	static std::queue<int> &getQueue() {
+	static std::queue<int>& getQueue() {
 		static std::queue<int> q; 
 		return q;
 	}
@@ -50,7 +50,7 @@ public:
 		static std::vector<T> d;
 		return d;
 	}
-	static T &at( unsigned i ) {
+	static T& at( unsigned i ) {
 		return getData()[i];
 	}
 

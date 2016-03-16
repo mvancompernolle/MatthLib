@@ -24,7 +24,7 @@ public:
 	~Collider();
 };
 
-matth::CollisionData evaluateCollision( const Transform& at, const Collider& ac, const Collider &bc, const Transform& bt );
+matth::CollisionData evaluateCollision( const Transform& at, const Collider& ac, const Transform& bt, const Collider &bc );
 
 #endif // COLLIDER_H
 

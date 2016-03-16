@@ -31,7 +31,7 @@ class CollisionDetection : public BinarySystem {
 	void onStep() { Collision::getData().clear();  }
 	bool condition( Handle<Entity> i ) { return i->transform > -1 && i->collider > -1; }
 	void update( Handle<Entity> i, Handle<Entity> j ) {
-		auto cd = evaluateCollision( *i->transform, *i->collider, *j->collider, *j->transform );
+		auto cd = evaluateCollision( *i->transform, *i->collider, *j->transform, *j->collider );
 		if ( cd.wasCollision ) {
 			Collision::getData().push_back( Collision{ i, j, cd } );
 		}

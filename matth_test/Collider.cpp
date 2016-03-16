@@ -10,7 +10,7 @@ Collider::Collider() : shape( e_CIRCLE ), circle{ { 0.0f, 0.0f }, 1.0f } {
 Collider::~Collider() {
 }
 
-matth::CollisionData evaluateCollision( const Transform& at, const Collider& ac, const Collider &bc, const Transform& bt ) {
+matth::CollisionData evaluateCollision( const Transform& at, const Collider& ac, const Transform& bt, const Collider &bc ) {
 	const Collider* collLeft = &ac;
 	const Collider* collRight = &bc;
 	const Transform* transLeft = &at;
@@ -35,6 +35,8 @@ matth::CollisionData evaluateCollision( const Transform& at, const Collider& ac,
 		return collisionTest( transLeft->getGlobalTransform() * collLeft->aabb, transRight->getGlobalTransform() * collRight->ray );
 	case Collider::e_AABB | Collider::e_PLANE:
 		return collisionTest( transLeft->getGlobalTransform() * collLeft->aabb, transRight->getGlobalTransform() * collRight->plane );
+	case Collider::e_RAY | Collider::e_PLANE:
+		return collisionTest( transLeft->getGlobalTransform() * collLeft->ray, transRight->getGlobalTransform() * collRight->plane );
 	default:
 		return matth::CollisionData{ false };
 	}

@@ -200,11 +200,11 @@ namespace matth {
 		};
 	}
 
-	mat4 mat4::mat3ToMat4( float* mat3 ) {
+	mat4 mat4::mat3ToMat4( float* mat3, float z ) {
 		return{ mat3[0], mat3[1], 0.0f, mat3[2],
 				mat3[3], mat3[4], 0.0f, mat3[5],
 				0.0f, 0.0f, 1.0f, 0.0f,
-				mat3[6], mat3[7], 0.0f, mat3[8] };
+				mat3[6], mat3[7], z, mat3[8] };
 	}
 
 	bool operator==( const mat4& lhs, const mat4& rhs ) {

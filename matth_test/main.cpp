@@ -10,7 +10,10 @@
 #include "CollisionSystem.h"
 #include "DynamicResolution.h"
 #include "PlayerMovSystem.h"
+#include "RenderSystem.h"
+#include "Assets.h"
 #include "matth.h"
+
 int main() {
 	auto& window = Window::instance();
 	auto& input = Input::instance();
@@ -19,10 +22,14 @@ int main() {
 	window.initialize();
 	input.initialize();
 	time.initialize();
-
+	Assets::instance().loadTexture( "smiley", "../resources/smiley.png" );
 
 	auto ball = Factory::makeBall( { 720,  200 }, { }, 60, 1 );
+	Factory::makeBall( { 320,  200 }, {}, 60, 1 );
 	ball->controller = PlayerController::make();
+	ball->sprite = Sprite::make();
+	ball->sprite->assetName = "smiley";
+	ball->sprite->dimension = matth::vec2{ 72.0f, 72.0f };
 
 
 	DebugDraw debugDrawSystem;
@@ -31,6 +38,7 @@ int main() {
 	CollisionDetection collisionSystem;
 	DynamicResolution resolutionSystem;
 	PlayerMovSystem movSystem;
+	RenderSystem renderSystem;
 
 	while ( window.update() ) {
 		input.update();
@@ -42,6 +50,7 @@ int main() {
 		collisionSystem.step();
 		movSystem.step();
 		resolutionSystem.step();
+		renderSystem.step();
 	}
 
 	time.terminate();

@@ -43,7 +43,7 @@ namespace matth {
 		static mat4 frustum( float l, float r, float b, float t, float n, float f );
 		static mat4 perspective( float fov, float aspect, float n, float f );
 		static mat4 lookAt( const vec3& eye, const vec3& target, const vec3& up );
-		static mat4 mat3ToMat4( float* mat3 );
+		static mat4 mat3ToMat4( float* mat3, float z = 1.0f );
 	};
 
 	bool operator==( const mat4& lhs, const mat4& rhs );

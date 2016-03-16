@@ -5,6 +5,7 @@
 #include "Rigidbody.h"
 #include "LifeTime.h"
 #include "PlayerController.h"
+#include "Sprite.h"
 
 class Entity : public GCData<Entity> {
 public:
@@ -13,6 +14,7 @@ public:
 	Handle<Collider> collider;
 	Handle<LifeTime> lifeTime;
 	Handle<PlayerController> controller;
+	Handle<Sprite> sprite;
 
 	void onFree() {
 		Transform::free( transform );
@@ -20,6 +22,7 @@ public:
 		Collider::free( collider );
 		LifeTime::free( lifeTime );
 		PlayerController::free( controller );
+		Sprite::free( sprite );
 	}
 };
 
