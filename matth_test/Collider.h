@@ -11,7 +11,11 @@ class Transform;
 
 class Collider : public GCData<Collider>{
 public:
-	enum SHAPE { e_CIRCLE = 1, e_AABB = 2, e_RAY = 4, e_PLANE = 8 } shape;
+	enum SHAPE { e_CIRCLE = 1,
+		e_AABB = e_CIRCLE << 1,
+		e_RAY = e_AABB << 1,
+		e_PLANE = e_RAY << 1,
+		e_CHULL = e_PLANE << 1} shape;
 	union {
 		matth::Circle circle;
 		matth::Ray ray;

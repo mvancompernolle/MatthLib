@@ -153,6 +153,8 @@
     <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="RigidBodyDynamics.h" />
     <ClInclude Include="sfwdraw.h" />
+    <ClInclude Include="ShapeSpawner.h" />
+    <ClInclude Include="ShapeSpawnSystem.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Time.h" />

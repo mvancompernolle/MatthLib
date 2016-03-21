@@ -29,14 +29,24 @@ matth::CollisionData evaluateCollision( const Transform& at, const Collider& ac,
 		return collisionTest( transLeft->getGlobalTransform() * collLeft->circle, transRight->getGlobalTransform() * collRight->ray );
 	case Collider::e_CIRCLE | Collider::e_PLANE:
 		return collisionTest( transLeft->getGlobalTransform() * collLeft->circle, transRight->getGlobalTransform() * collRight->plane );
+	case Collider::e_CIRCLE | Collider::e_CHULL:
+		return collisionTest( transLeft->getGlobalTransform() * collLeft->circle, transRight->getGlobalTransform() * collRight->cHull );
 	case Collider::e_AABB:
 		return collisionTest( transLeft->getGlobalTransform() * collLeft->aabb, transRight->getGlobalTransform() * collRight->aabb );
 	case Collider::e_AABB | Collider::e_RAY:
 		return collisionTest( transLeft->getGlobalTransform() * collLeft->aabb, transRight->getGlobalTransform() * collRight->ray );
 	case Collider::e_AABB | Collider::e_PLANE:
 		return collisionTest( transLeft->getGlobalTransform() * collLeft->aabb, transRight->getGlobalTransform() * collRight->plane );
+	case Collider::e_AABB | Collider::e_CHULL:
+		return collisionTest( transLeft->getGlobalTransform() * collLeft->aabb, transRight->getGlobalTransform() * collRight->cHull );
 	case Collider::e_RAY | Collider::e_PLANE:
 		return collisionTest( transLeft->getGlobalTransform() * collLeft->ray, transRight->getGlobalTransform() * collRight->plane );
+	case Collider::e_RAY | Collider::e_CHULL:
+		return collisionTest( transLeft->getGlobalTransform() * collLeft->ray, transRight->getGlobalTransform() * collRight->cHull );
+	case Collider::e_PLANE | Collider::e_CHULL:
+		return collisionTest( transLeft->getGlobalTransform() * collLeft->plane, transRight->getGlobalTransform() * collRight->cHull );
+	case Collider::e_CHULL:
+		return collisionTest( transLeft->getGlobalTransform() * collLeft->cHull, transRight->getGlobalTransform() * collRight->cHull );
 	default:
 		return matth::CollisionData{ false };
 	}

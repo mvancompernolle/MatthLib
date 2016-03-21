@@ -11,6 +11,7 @@
 #include "DynamicResolution.h"
 #include "PlayerMovSystem.h"
 #include "RenderSystem.h"
+#include "ShapeSpawnSystem.h"
 #include "Assets.h"
 #include "matth.h"
 
@@ -18,20 +19,23 @@ int main() {
 	auto& window = Window::instance();
 	auto& input = Input::instance();
 	auto& time = Time::instance();
-
+	// create core 
 	window.initialize();
 	input.initialize();
 	time.initialize();
 	Assets::instance().loadTexture( "smiley", "../resources/smiley.png" );
 
-	auto ball = Factory::makeBall( { 720,  200 }, { }, 60, 1 );
-	Factory::makeBall( { 320,  200 }, {}, 60, 1 );
+	// create entities
+	auto ball = Factory::makeBall( { 720,  500 }, { }, 60, 1 );
 	ball->controller = PlayerController::make();
 	ball->sprite = Sprite::make();
 	ball->sprite->assetName = "smiley";
 	ball->sprite->dimension = matth::vec2{ 72.0f, 72.0f };
+	
+	// make shape spawner
+	Factory::makeSpawner( matth::vec2{window.getWidth() / 2.0f, 5.0f} );
 
-
+	// create systems
 	DebugDraw debugDrawSystem;
 	RigidBodyDynamics rigidBodySystem;
 	LifeTimeSystem lifeTimeSystem;
@@ -39,79 +43,25 @@ int main() {
 	DynamicResolution resolutionSystem;
 	PlayerMovSystem movSystem;
 	RenderSystem renderSystem;
+	ShapeSpawnSystem spawnSystem;
 
 	while ( window.update() ) {
 		input.update();
 		time.update();
 
-		debugDrawSystem.step();
 		rigidBodySystem.step();
 		lifeTimeSystem.step();
 		collisionSystem.step();
+		spawnSystem.step();
 		movSystem.step();
 		resolutionSystem.step();
 		renderSystem.step();
+		debugDrawSystem.step();
+
+		if ( input.getKey( 256 ) ) break;
 	}
 
 	time.terminate();
 	input.terminate();
 	window.terminate();
 }
-
-//matth::mat3 matrix;
-//matrix.c1 = { 1.0f, 0.0f, 5.0f };
-//matrix.c2 = { 2.0f, 1.0f, 6.0f };
-//matrix.c3 = { 3.0f, 4.0f, 0.0f };
-//std::cout << "matrix: " << std::endl << matrix << std::endl;
-//std::cout << "determinant" << matrix.determinant() << std::endl;
-//std::cout << "inverse: " << std::endl << matrix * matrix.inverse() << std::endl << mat3::identity() << std::endl;
-//assert( (matrix.determinant() == 0.0f || matrix * matrix.inverse() == mat3::identity()));
-//system( "pause" );
-//return 0;
-
-
-//sfw::initContext();
-//sfw::setBackgroundColor( BLACK );
-
-//unsigned smiley = sfw::loadTextureMap( "resources/smiley.png" );
-
-//matth::Circle c1{ {100.0f, 100.0f}, 50.0f }, c2{ { 700.0f, 100.0f }, 50.0f };
-//assert( matth::collisionTest( c1, c2 ).wasCollision == false && "circle test 1 failed" );
-//matth::AABB box = { {0.0f, 0.0f}, {50.0f, 50.0f} };
-//matth::ConvexHull hull;
-//hull.verts = { {350.0f, 200.0f}, {370.0f, 250.0f}, {370.0f, 400.0f}, {200.0f, 380.0f}, {280.0f, 250.0f} };
-//Ray r;
-//r.dir = { 1.0f, 0.5f };
-//r.len = 50.0f;
-//r.pos = { 0.0f, 0.0f };
-//Plane p;
-//p.pos = { 0.0f, 0.0f };
-//p.normal = { -0.5f, 0.5f };
-
-//matth::Transform t1, t2;
-//matth::RigidBody r1, r2;
-//t1.setPos( c1.pos );
-//t1.setScale( { c1.radius * 2, c1.radius * 2 } );
-////t2.setPos( c2.pos );
-//t2.setScale( { 1.1f, 1.1f } );
-
-//while ( sfw::stepContext() ) {
-//	t2.setPos( t2.getPos() + vec2{ 10.0f, 10.0f } *sfw::getDeltaTime() );
-//	t2.setScale( vec2{ 0.5f, 0.5f } +vec2{ std::abs( std::cos( sfw::getTime() ) ),std::abs( std::cos( sfw::getTime() ) ) } / 2.0f );
-//	//t1.setAngle(90 * sfw::getTime());
-//	t2.setAngle( 90 * sfw::getTime() );
-//	//r1.integrate( &t1, sfw::getDeltaTime() );
-//	//r2.integrate( &t2, sfw::getDeltaTime() );
-//	drawCircle( t2.getGlobalTransform() * c1 );
-//	drawAABB( t2.getGlobalTransform() * box );
-//	drawHull( t2.getGlobalTransform() * hull );
-//	drawRay( t2.getGlobalTransform() * r );
-//	drawPlane( t2.getGlobalTransform() * p );
-
-//	if ( sfw::getKey( KEY_ESCAPE ) ) {
-//		break;
-//	}
-//}
-
-//sfw::termContext();
-//return 0;

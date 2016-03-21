@@ -27,7 +27,7 @@ namespace matth {
 	CollisionData collisionTest( const ConvexHull& a, const Plane& b );
 	inline CollisionData collisionTest( const Plane& a, const ConvexHull& b ) { return collisionTest( b, a ); }
 	CollisionData collisionTest( const ConvexHull& a, const AABB& b );
-	inline CollisionData collisionTest( const AABB& a, const ConvexHull& b ) { collisionTest( b, a ); }
+	inline CollisionData collisionTest( const AABB& a, const ConvexHull& b ) { return collisionTest( b, a ); }
 
 	CollisionData collisionTest( const AABB& a, const AABB& b );
 	CollisionData collisionTest( const AABB& a, const Circle& b );

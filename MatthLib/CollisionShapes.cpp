@@ -29,7 +29,7 @@ namespace matth {
 			}
 		}
 		aabb.pos = { ( rMin + rMax ) / 2.0f };
-		aabb.hExtents = { ( rMax - rMin ) / 2.0f };
+		aabb.hExtents = { ( rMin - rMax ) / 2.0f };
 		return aabb;
 	}
 	Ray operator*( const mat3& m, const Ray& a ) {
@@ -45,7 +45,7 @@ namespace matth {
 	Plane operator*( const mat3& m, const Plane& a ) {
 		const vec3 nor{ a.normal.x, a.normal.y, 0.0f };
 		const vec3 pos{ a.pos.x, a.pos.y, 1.0f };
-		return{ ( m * pos ).xy, ( m*nor ).xy };
+		return{ ( m * pos ).xy, ( m*nor ).normal().xy };
 	}
 	ConvexHull operator*( const mat3& m, const ConvexHull& a ) {
 		ConvexHull hull;

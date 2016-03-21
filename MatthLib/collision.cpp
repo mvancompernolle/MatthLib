@@ -65,8 +65,8 @@ namespace matth {
 		std::vector<float> pDepths;
 
 		for ( int vert = 0; vert < a.verts.size(); ++vert ) {
-			vec2 vecBetween = a.verts[vert] - a.verts[( vert + 1 ) % a.verts.size()];
-			vec2 axis = vecBetween.normal().perp();
+			const vec2 vecBetween = a.verts[vert] - a.verts[( vert + 1 ) % a.verts.size()];
+			const vec2 axis = vecBetween.normal().perp();
 			float aMin = INFINITY, aMax = -INFINITY;
 			float bMin = INFINITY, bMax = -INFINITY;
 
@@ -76,20 +76,24 @@ namespace matth {
 				aMax = fmaxf( projection, aMax );
 			}
 
-			float cirProj = dot( axis, b.pos );
+			const float cirProj = dot( axis, b.pos );
 			bMin = cirProj - b.radius;
 			bMax = cirProj + b.radius;
 
-			float pDepth = fminf( aMax - bMin, bMax - aMin );
+			const float pDepth = fminf( aMax - bMin, bMax - aMin );
 
-			if ( cData.depth >= 0.0f && pDepth < cData.depth ) {
-				cData.depth = pDepth;
-				cData.wasCollision = true;
+			// handle case where there was a gap and no collision
+			if ( pDepth < 0.0f ) {
+				cData.wasCollision = false;
+				if ( pDepth > cData.depth || cData.depth >= 0.0f ) {
+					cData.depth = pDepth;
+				}
 				cData.normal = axis;
 			}
-			else if ( cData.depth < 0.0f && pDepth > cData.depth ) {
+			// handle case where there is overlap and no gap has been detected yet
+			else if ( pDepth >= 0.0f && cData.depth > 0.0f && cData.depth > pDepth ) {
 				cData.depth = pDepth;
-				cData.wasCollision = false;
+				cData.wasCollision = true;
 				cData.normal = axis;
 			}
 		}
@@ -191,7 +195,7 @@ namespace matth {
 		return collision;
 	}
 
-	CollisionData collisionTest( const AABB& a, const AABB& b ) {
+	CollisionData collisionTest( const AABB& a, const AABB& b ){
 		// get all of the different overlaps
 		CollisionData cData;
 		const float left = b.min().x - a.max().x;
@@ -229,17 +233,22 @@ namespace matth {
 	CollisionData collisionTest( const AABB& a, const Circle& b ) {
 		CollisionData cData;
 		vec2 point = { clamp( b.pos.x, a.min().x, a.max().x ), clamp( b.pos.y, a.min().y, a.max().y ) };
-		const float dist = ( b.pos - a.pos ).length();
+		//std::cout << "pos: " << a.pos.x << ", " << a.pos.y << std::endl;
+		//std::cout << "extents: " << a.hExtents.x << ", " << a.hExtents.y << std::endl;
+		//std::cout << "rect min: " << a.min().x << ", " << a.min().y << std::endl;
+		//std::cout << "rect max: " << a.max().x << ", " << a.max().y << std::endl << std::endl;
+		//std::cout << "clamped: " << point.x << ", " << point.y << std::endl;
+		const float dist = ( point - b.pos ).length();
 
 		// get collision normal
 		vec2 normal = { 0.0f, 0.0f };
-		if ( point.x == b.pos.x ) {
-			cData.normal.y = ( b.pos.y <= point.y ? -1.0f : 0.0f );
-		} else {
-			cData.normal.x = ( b.pos.x <= point.x ? -1.0f : 0.0f );
-		}
+		if ( point.x == a.min().x ) { cData.normal.x = -1.0f; }
+		else if ( point.x == a.max().x ) { cData.normal.x = 1.0f; }
+
+		if ( point.y == a.min().y ) { cData.normal.y = -1.0f; } 
+		else if ( point.y == a.max().y ) { cData.normal.y = 1.0f; }
 		cData.depth = b.radius - dist;
-		cData.wasCollision = cData.depth >= 0.0f;
+		cData.wasCollision = (cData.depth >= 0.0f);
 
 		return cData;
 	}
@@ -308,7 +317,7 @@ namespace matth {
 		const vec2 closestPoint = b.pos + b.dir * clamp( dot( ( a.pos - b.pos ), b.dir ), 0.0f, b.len );
 		const vec2 distVec = closestPoint - b.pos;
 		const float dist = ( a.pos - closestPoint ).length();
-		cData.wasCollision = dist <= a.radius;
+		cData.wasCollision = (dist <= a.radius);
 		cData.depth = a.radius - dist;
 		cData.normal = -b.dir;
 		return cData;

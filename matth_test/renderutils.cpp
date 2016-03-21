@@ -84,6 +84,8 @@ void drawCollider( const Transform& transform, const Collider& collider ) {
 	case Collider::e_PLANE:
 		drawPlane( transform.getGlobalTransform() * collider.plane );
 		break;
+	case Collider::e_CHULL:
+		drawHull( transform.getGlobalTransform() * collider.cHull );
 	default:
 		break;
 	}

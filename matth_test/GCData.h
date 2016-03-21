@@ -55,7 +55,7 @@ public:
 	}
 
 	static void free( int i ) {
-		if ( !at( i ).isVacant ) {
+		if ( i > -1 && !at( i ).isVacant ) {
 			at( i ).onFree();
 			getQueue().push( i );
 			at( i ).isVacant = true;
@@ -69,6 +69,8 @@ public:
 		if ( getQueue().size() > 0 ) {
 			i = getQueue().front();
 			getQueue().pop();
+			Handle<T> handle = { i };
+			*handle = T();
 		}
 		else {
 			i = getData().size();

@@ -3,6 +3,8 @@
 
 bool Window::initialize( unsigned width, unsigned height, const char* title ) {
 	if ( initialized ) return true;
+	this->width = width;
+	this->height = height;
 	initialized = sfw::initContext( width, height, title );
 	return initialized;
 }

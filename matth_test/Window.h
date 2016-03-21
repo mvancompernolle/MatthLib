@@ -15,8 +15,8 @@
 
 template<typename T>
 class IWindow {
-	unsigned width, height;
 protected:
+	unsigned width, height;
 	IWindow() : initialized( false ) {}
 public:
 	bool initialized;

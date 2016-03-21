@@ -1,5 +1,6 @@
 #pragma once
 #include "Entity.h"
+#include "Window.h"
 #include "vec2.h"
 // Factory Method
 // Constructor with a lot of meaningful defaults
@@ -11,7 +12,6 @@ struct Factory {
 		e->collider = Collider::make();
 		e->rigidbody = RigidBody::make();
 		e->transform = Transform::make();
-		e->controller = PlayerController::make();
 
 		e->collider->circle.radius = radius;
 		e->collider->shape = Collider::e_CIRCLE;
@@ -38,4 +38,22 @@ struct Factory {
 		return e;
 	}
 
+	static Handle<Entity> makeCollisionShape( Collider::SHAPE shape ) {
+		auto e = Entity::make();
+		e->collider = Collider::make();
+		e->collider->shape = shape;
+		e->rigidbody = RigidBody::make();
+		e->transform = Transform::make();
+		return e;
+	}
+
+	static Handle<Entity> makeSpawner( matth::vec2 pos ) {
+		auto e = Entity::make();
+		e->transform = Transform::make();
+		e->transform->setPos( pos );
+		e->shapeSpawner = ShapeSpawner::make();
+		e->shapeSpawner->minXOffset = -(Window::instance().getWidth() / 2.0f);
+		e->shapeSpawner->maxXOffset = Window::instance().getWidth() / 2.0f;
+		return e;
+	}
 };
