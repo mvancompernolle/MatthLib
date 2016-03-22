@@ -37,22 +37,24 @@ namespace matth {
 			}
 			for ( int i = 0; i < b.verts.size(); ++i ) {
 				float projection = dot( axes[axis], b.verts[i] );
-				aMin = fminf( projection, aMin );
-				aMax = fmaxf( projection, aMax );
+				bMin = fminf( projection, bMin );
+				bMax = fmaxf( projection, bMax );
 			}
 
 			float pDepth = fminf( aMax - bMin, bMax - aMin );
-
-			// if collision overlap is smaller update it
-			if ( cData.depth >= 0.0f && pDepth < cData.depth ) {
-				cData.depth = pDepth;
-				cData.wasCollision = true;
+			
+			// handle case where there was a gap and no collision
+			if ( pDepth < 0.0f ) {
+				cData.wasCollision = false;
+				if ( pDepth > cData.depth || cData.depth >= 0.0f ) {
+					cData.depth = pDepth;
+				}
 				cData.normal = axes[axis];
 			}
-			// if no collision and gap is smaller update it
-			else if( cData.depth < 0.0f && pDepth > cData.depth ){
+			// handle case where there is overlap and no gap has been detected yet
+			else if ( pDepth >= 0.0f && cData.depth > 0.0f && cData.depth > pDepth ) {
 				cData.depth = pDepth;
-				cData.wasCollision = false;
+				cData.wasCollision = true;
 				cData.normal = axes[axis];
 			}
 		}
@@ -104,7 +106,7 @@ namespace matth {
 		CollisionData cData = { false };
 		cData.depth = INFINITY;
 		std::vector<vec2> axes;
-
+	
 		for ( int i = 0; i < a.verts.size(); ++i ) {
 			const vec2 vecBetween = a.verts[i] - a.verts[( i + 1 ) % a.verts.size()];
 			axes.push_back( vecBetween.normal().perp() );
@@ -113,27 +115,25 @@ namespace matth {
 		float tMin = 0.0f, tMax = 1.0f;
 
 		for ( int i = 0; i < axes.size(); ++i ) {
-			const float N = -dot( axes[i], b.pos - a.verts[i] );
-			const float D = dot( axes[i], b.dir );
+			// get the point plane distance
+			const float N = dot( axes[i], b.pos - a.verts[i] );
 
-			if ( fabs( D ) < FLT_EPSILON ) {
-				if ( N < 0.0f ) return cData;
-				else continue;
-			}
+			// if they are facing eachother this is greater than 0
+			const float D = -dot( axes[i], b.dir ); 
+			const float dist = N / D;
 
-			const float t = N / D;
-
-			if ( D < 0.0f ) {
-				if ( tMin < t ) {
-					tMin = t;
-					cData.normal = axes[i];
-					cData.depth = b.len - tMin;
-				}
+			if ( D < 0.0f && dist > tMin) {
+				// ray is facing the plane and ray is further penetrating the hull
+				tMin = dist;
+				cData.normal = axes[i];
+				cData.wasCollision = tMin < tMax;
+				cData.depth = ( tMax - tMin ) * b.len;
 			} else {
-				tMax = t;
+				tMax = fminf(tMax, dist );
 			}
+
+			if ( tMin < tMax ) return cData;
 		}
-		cData.wasCollision = tMin <= tMax;
 		return cData;
 	}
 
@@ -156,46 +156,55 @@ namespace matth {
 	}
 
 	CollisionData collisionTest( const ConvexHull& a, const AABB& b ) {
-		CollisionData collision = { false };
-		float depth = INFINITY;
+		CollisionData cData = { false };
+		cData.depth = INFINITY;
 		std::vector<vec2> axes;
-		std::vector<float> pDepths;
+		const std::vector<vec2> aabbPoints = { b.min(), b.max(), {b.min().x, b.max().y}, {b.max().x, b.min().y} };
 
 		for ( int i = 0; i < a.verts.size(); ++i ) {
 			vec2 vecBetween = a.verts[i] - a.verts[( i + 1 ) % a.verts.size()];
 			axes.push_back( vecBetween.normal().perp() );
 		}
-		axes.push_back( vec2( vec2{ b.min().x, b.max().y } -vec2{ b.max().x, b.max().y } ).normal().perp() );
-		axes.push_back( vec2( vec2{ b.min().x, b.max().y } -vec2{ b.min().x, b.min().y } ).normal().perp() );
+		axes.push_back(  vec2{0.0f, 1.0f} );
+		axes.push_back( vec2{ 1.0f, 0.0f } );
 
 		for ( int axis = 0; axis < axes.size(); ++axis ) {
 			float aMin = INFINITY, aMax = -INFINITY;
 			float bMin = INFINITY, bMax = -INFINITY;
 
 			for ( int i = 0; i < a.verts.size(); ++i ) {
-				float projection = dot( axes[axis], a.verts[i] );
+				const float projection = dot( axes[axis], a.verts[i] );
 				aMin = fminf( projection, aMin );
 				aMax = fmaxf( projection, aMax );
 			}
-			float projection = dot( axes[axis], vec2{ b.min().x, b.min().y } );
-			aMin = fminf( projection, aMin );
-			aMax = fmaxf( projection, aMax );
-			projection = dot( axes[axis], vec2{ b.max().x, b.max().y } );
-			aMin = fminf( projection, aMin );
-			aMax = fmaxf( projection, aMax );
+			for ( int i = 0; i < aabbPoints.size(); ++i ) {
+				float projection = dot( axes[axis], aabbPoints[i] );
+				bMin = fminf( projection, bMin );
+				bMax = fmaxf( projection, bMax );
+			}
 
 			float pDepth = fminf( aMax - bMin, bMax - aMin );
 
-			if ( pDepth < depth ) {
-				depth = pDepth;
-				collision = { pDepth < 0.0f, axes[axis] * depth };
-				if ( pDepth < 0.0f ) return collision;
+			// handle case where there was a gap and no collision
+			if ( pDepth < 0.0f ) {
+				cData.wasCollision = false;
+				if ( pDepth > cData.depth || cData.depth >= 0.0f ) {
+					cData.depth = pDepth;
+				}
+				cData.normal = axes[axis];
+			}
+			// handle case where there is overlap and no gap has been detected yet
+			else if ( pDepth >= 0.0f && cData.depth > 0.0f && cData.depth > pDepth ) {
+				cData.depth = pDepth;
+				cData.wasCollision = true;
+				cData.normal = axes[axis];
 			}
 		}
-		return collision;
+		//std::cout << "aabb vs chull depth: " << cData.depth << std::endl;
+		return cData;
 	}
 
-	CollisionData collisionTest( const AABB& a, const AABB& b ){
+	CollisionData collisionTest( const AABB& a, const AABB& b ) {
 		// get all of the different overlaps
 		CollisionData cData;
 		const float left = b.min().x - a.max().x;
@@ -205,19 +214,26 @@ namespace matth {
 
 		if ( left > 0.0f || right < 0.0f || top > 0.0f || bottom < 0.0f ) {
 			// there is no overlap
-			const float gapX = abs( right ) < left ? right : left;
-			const float gapY = abs( bottom ) < top ? bottom : top;
-			if ( gapX <= gapY ) {
-				cData.depth = gapX;
-				cData.normal = ( gapX == left ? vec2{ -1.0f, 0.0f } : vec2{ 1.0f, 0.0f } );
-			} else {
-				cData.depth = gapY;
-				cData.normal = ( gapY == top ? vec2{ 0.0f, 1.0f } : vec2{ 0.0f, -1.0f } );
+
+			// get min horizontal movement needed for an x overlap
+			const float gapX = -abs( left ) > right ? -abs( left ) : right;
+			// get min vertical movement needed for a y overlap
+			const float gapY = -abs( top ) > bottom ? -abs( top ) : bottom;
+			//std::cout << "gapX: " << gapX << " gapY: " << gapY << std::endl;
+
+			if (left > 0.0f || right < 0.0f ) {
+				cData.normal.x = ( gapX == right ? gapX : -gapX );
 			}
+			if ( top > 0.0f || bottom < 0.0f ) {
+				cData.normal.y = ( gapY == bottom ? gapY : -gapY );
+			}
+			cData.depth = -cData.normal.length();
+			//std::cout << "normal: " << cData.normal.x << ", " << cData.normal.y << std::endl;
+			cData.normal = cData.normal.normal();
 		} else {
 			// there is an overlap
-			const float collX = abs( left ) < right ? left : right;
-			const float collY = abs( top ) < bottom ? top : bottom;
+			const float collX = abs( left ) < right ? abs( left ) : right;
+			const float collY = abs( top ) < bottom ? abs( top ) : bottom;
 			if ( collX <= collY ) {
 				cData.depth = collX;
 				cData.normal = ( collX == right ? vec2{ 1.0f, 0.0f } : vec2{ -1.0f, 0.0f } );
@@ -242,13 +258,11 @@ namespace matth {
 
 		// get collision normal
 		vec2 normal = { 0.0f, 0.0f };
-		if ( point.x == a.min().x ) { cData.normal.x = -1.0f; }
-		else if ( point.x == a.max().x ) { cData.normal.x = 1.0f; }
+		if ( point.x == a.min().x ) { cData.normal.x = -1.0f; } else if ( point.x == a.max().x ) { cData.normal.x = 1.0f; }
 
-		if ( point.y == a.min().y ) { cData.normal.y = -1.0f; } 
-		else if ( point.y == a.max().y ) { cData.normal.y = 1.0f; }
+		if ( point.y == a.min().y ) { cData.normal.y = -1.0f; } else if ( point.y == a.max().y ) { cData.normal.y = 1.0f; }
 		cData.depth = b.radius - dist;
-		cData.wasCollision = (cData.depth >= 0.0f);
+		cData.wasCollision = ( cData.depth >= 0.0f );
 
 		return cData;
 	}
@@ -265,6 +279,14 @@ namespace matth {
 
 	CollisionData collisionTest( const AABB& a, const Ray& b ) {
 		CollisionData cData;
+
+		// return depth of 0 and collision if ray starts within aabb
+		if ( b.pos.x > a.min().x && b.pos.x < a.max().x
+			&& b.pos.y > a.min().y && b.pos.y < a.max().y ) {
+			cData.depth = 0.0f;
+			cData.wasCollision = true;
+			return cData;
+		}
 
 		// Min/Max along the X-Axis
 		const Plane s1p1 = Plane{ a.max(), {1.0f, 0.0f} };
@@ -288,7 +310,7 @@ namespace matth {
 		const float tmax = std::fminf( t2max, t1max );
 
 		cData.depth = b.len - tmin;
-		cData.wasCollision = cData.depth >= 0 && tmin <= tmax && tmin > 0;
+		cData.wasCollision = ( cData.depth >= 0 && tmin <= tmax && tmin > 0 );
 		cData.normal = ( t1min > t2min ) ? n1 : n2;
 
 		return cData;
@@ -317,7 +339,7 @@ namespace matth {
 		const vec2 closestPoint = b.pos + b.dir * clamp( dot( ( a.pos - b.pos ), b.dir ), 0.0f, b.len );
 		const vec2 distVec = closestPoint - b.pos;
 		const float dist = ( a.pos - closestPoint ).length();
-		cData.wasCollision = (dist <= a.radius);
+		cData.wasCollision = ( dist <= a.radius );
 		cData.depth = a.radius - dist;
 		cData.normal = -b.dir;
 		return cData;
@@ -326,15 +348,20 @@ namespace matth {
 	CollisionData collisionTest( const Ray& a, const Plane& b ) {
 		// gets the shortest vector to move out of collision with Plane
 		CollisionData cData{ true };
-		const float dotVal = dot( b.normal, a.dir );
+		const float dotVal = -dot( b.normal, a.dir );
+		const float pointPos = dot( b.normal, vec2{ a.pos - b.pos } );
+		// if not facing the plane
 		if ( dotVal <= 0.0f ) {
-			cData.wasCollision = false;
-		}
-		else {
-			const float rayPlaneDistance = dot( b.normal, vec2{ a.pos - b.pos } ) / -dotVal;
+			// colliding only if behind the plane
+			cData.wasCollision = (pointPos < 0.0f);
+		} else {
+			// get distance to plane
+			const float rayPlaneDistance = pointPos / dotVal;
 			cData.depth = a.len - rayPlaneDistance;
-			cData.normal = -b.normal;
+			cData.normal = -a.dir;
+			cData.wasCollision = ( cData.depth > 0.0f );
 		}
+		std::cout << "ray vs plane depth: " << cData.depth << std::endl;
 		return cData;
 	}
 }

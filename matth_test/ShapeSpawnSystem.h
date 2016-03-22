@@ -22,7 +22,7 @@ public:
 
 	Handle<Entity> createShape( Handle<Entity>& i ) const {
 		auto& spawner = *i->shapeSpawner;
-		const unsigned shapeType = rand() % 5;
+		const unsigned shapeType = 4;//rand() % 5;
 		const float scale = spawner.minScale + getRandomPercent() * ( spawner.maxScale - spawner.minScale );
 		Handle<Entity> entity;
 		switch ( shapeType ) {
@@ -50,7 +50,7 @@ public:
 		case 4: {
 			entity = Factory::makeCollisionShape( Collider::SHAPE::e_CHULL );
 			// create an n sided polygon
-			const unsigned numSides = 3 + rand() % 10;
+			const unsigned numSides = 3;// +rand() % 10;
 			const float r = 0.5f;
 			for ( unsigned i = 0; i < numSides; ++i ) {
 				const float x = r * (float)cos( ( 2 * PI * i ) / numSides );

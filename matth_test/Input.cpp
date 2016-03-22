@@ -1,7 +1,9 @@
 #include "Input.h"
 #include "Window.h"
 #include "sfwdraw.h"
+#include "Time.h"
 #include <cstring>
+#include <iostream>
 
 bool Input::initialize() {
 	memset( keyRelease, 0, 400 );
@@ -15,19 +17,19 @@ bool Input::update() {
 	for ( unsigned i = 0; i < 400; ++i ) {
 		keyState[i] = keyPress[i] > keyRelease[i];
 		if ( sfw::getKey( i ) ) {
-			keyPress[i] = sfw::getTime();
+			keyPress[i] = Time::instance().getTotalTime();
 		}
 		else {
-			keyRelease[i] = sfw::getTime();
+			keyRelease[i] = Time::instance().getTotalTime();
 		}
 	}
 
 	for ( unsigned i = 0; i < 10; ++i ) {
 		mouseState[i] = mousePress[i] > mouseRelease[i];
 		if ( sfw::getMouseButton( i ) ) {
-			mousePress[i] = sfw::getTime();
+			mousePress[i] = Time::instance().getTotalTime();
 		} else {
-			mouseRelease[i] = sfw::getTime();
+			mouseRelease[i] = Time::instance().getTotalTime();
 		}
 	}
 

@@ -4,13 +4,15 @@
 #include <cassert>
 class PlayerController : public GCData<PlayerController> {
 public:
-	char LEFT, RIGHT, CLOCKWISE, CCLOCKWISE, SHRINK, GROW;
+	unsigned LEFT, RIGHT, UP, DOWN, CLOCKWISE, CCLOCKWISE, SHRINK, GROW;
+	unsigned CIRCLE, AABB, RAY, PLANE, CHULL;
 	float speed;
 	float turnSpeed;
 	float maxScale, minScale, scaleChangeRate;
 
-	PlayerController() : LEFT( 'A' ), RIGHT( 'D' ), SHRINK('S'), GROW('W'),
-		CLOCKWISE('E'), CCLOCKWISE('Q'), speed( 300.0f ), turnSpeed( 30.0f ),
+	PlayerController() : LEFT( 263 ), RIGHT( 262 ), UP(265), DOWN(264), SHRINK('S'), GROW('W'),
+		CLOCKWISE('D'), CCLOCKWISE('A'), CIRCLE(49), AABB( 50 ), RAY( 51 ),
+		PLANE( 52 ), CHULL( 53 ), speed( 300.0f ), turnSpeed( 90.0f ),
 		maxScale(3.0f), minScale(0.25f), scaleChangeRate(1.0f) {
 	}
 

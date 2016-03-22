@@ -44,6 +44,8 @@ struct Factory {
 		e->collider->shape = shape;
 		e->rigidbody = RigidBody::make();
 		e->transform = Transform::make();
+		e->lifeTime = LifeTime::make();
+		e->lifeTime->setLifeTime( 5.0f );
 		return e;
 	}
 

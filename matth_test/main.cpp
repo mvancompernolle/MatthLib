@@ -20,13 +20,13 @@ int main() {
 	auto& input = Input::instance();
 	auto& time = Time::instance();
 	// create core 
-	window.initialize();
 	input.initialize();
+	window.initialize();
 	time.initialize();
 	Assets::instance().loadTexture( "smiley", "../resources/smiley.png" );
 
 	// create entities
-	auto ball = Factory::makeBall( { 720,  500 }, { }, 60, 1 );
+	auto ball = Factory::makeBall( { 720,  500 }, { }, 50, 1 );
 	ball->controller = PlayerController::make();
 	ball->sprite = Sprite::make();
 	ball->sprite->assetName = "smiley";
@@ -49,19 +49,19 @@ int main() {
 		input.update();
 		time.update();
 
+		movSystem.step();
 		rigidBodySystem.step();
 		lifeTimeSystem.step();
-		collisionSystem.step();
-		spawnSystem.step();
-		movSystem.step();
-		resolutionSystem.step();
 		renderSystem.step();
 		debugDrawSystem.step();
+		collisionSystem.step();
+		spawnSystem.step();
+		resolutionSystem.step();
 
-		if ( input.getKey( 256 ) ) break;
+		if ( input.getKey( KEY_ESCAPE ) ) break;
 	}
 
-	time.terminate();
 	input.terminate();
 	window.terminate();
+	time.terminate();
 }

@@ -6,7 +6,7 @@ template<typename T>
 struct Handle {
 	int index;
 
-	Handle( int index = -1 ) : index{ index } {}
+	Handle( int index = -1 ) : index{ index }, dataRef(&GCData<T>::getData()) {}
 
 	T* operator->() {
 		return &GCData<T>::at( index );
@@ -33,6 +33,8 @@ struct Handle {
 	operator int() const {
 		return index;
 	}
+private: 
+	std::vector<T> *dataRef;
 };
 
 // Global Contiguous Data
@@ -69,8 +71,7 @@ public:
 		if ( getQueue().size() > 0 ) {
 			i = getQueue().front();
 			getQueue().pop();
-			Handle<T> handle = { i };
-			*handle = T();
+			at(i) = T();
 		}
 		else {
 			i = getData().size();
