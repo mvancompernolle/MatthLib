@@ -35,9 +35,23 @@ int main() {
 	ball->sprite->dimension = matth::vec2{ 72.0f, 72.0f };
 	
 	// make shape spawner
-	auto spawner = Factory::makeSpawner( matth::vec2{window.getWidth() / 2.0f, 15.0f} );
-	spawner->shapeSpawner->minXOffset = -(window.getWidth() * 0.4f);
-	spawner->shapeSpawner->maxXOffset = window.getWidth() * 0.4f ;
+	//auto spawner = Factory::makeSpawner( matth::vec2{window.getWidth() / 2.0f, 15.0f} );
+	//spawner->shapeSpawner->minXOffset = -(window.getWidth() * 0.4f);
+	//spawner->shapeSpawner->maxXOffset = window.getWidth() * 0.4f;
+
+	// make polygon to test against
+	auto entity = Factory::makeDynamicCollisionShape( Collider::SHAPE::e_CIRCLE );
+	/*const unsigned numSides = 5;
+	const float r = 0.5f;
+	for ( unsigned i = 0; i < numSides; ++i ) {
+		const float x = r * (float)cos( ( 2 * PI * i ) / numSides );
+		const float y = r * (float)sin( ( 2 * PI * i ) / numSides );
+		entity->collider->cHull.verts.push_back( { x, y } );
+	}*/
+	entity->transform->setPos( {window.getWidth() / 2.0f, window.getHeight() / 2.0f} );
+	entity->transform->setScale( {50.0f, 50.0f} );
+	//entity->collider->aabb.hExtents = {0.5f, 0.5f};
+	
 
 	// make static walls on the left and right
 	auto leftWall = Factory::makeStaticCollisionShape( Collider::SHAPE::e_PLANE );
@@ -67,7 +81,7 @@ int main() {
 		time.update();
 
 		movSystem.step();
-		//pushSystem.step();
+		pushSystem.step();
 		rigidBodySystem.step();
 		lifeTimeSystem.step();
 		spawnSystem.step();

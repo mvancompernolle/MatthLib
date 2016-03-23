@@ -11,11 +11,11 @@ class DynamicResolution : public CollisionSystem {
 	void update(Collision c) {
 		if ( c.collisionData.wasCollision ) {
 			matth::vec2 mtv = c.collisionData.normal * c.collisionData.depth;
-			//std::cout << "depth: " << c.collisionData.depth 
-				//<< " normal: " << c.collisionData.normal.x << ", " << c.collisionData.normal.y << std::endl;
+			std::cout << "depth: " << c.collisionData.depth 
+				<< " normal: " << c.collisionData.normal.x << ", " << c.collisionData.normal.y << std::endl;
 
 			// destroy the entity if it hits the player
-			if ( c.first->controller > -1 || c.second->controller > -1 ) {
+			if ( false && c.first->controller > -1 || c.second->controller > -1 ) {
 				auto& shape = ( c.first->controller > -1 ) ? c.second : c.first;
 				// give shape lifetime in order to have it get destroyed
 				shape->free( shape );

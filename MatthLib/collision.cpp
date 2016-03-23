@@ -1,6 +1,7 @@
 #include "collision.h"
-
+#include "matth.h"
 #include <vector>
+#include <iostream>
 
 namespace matth {
 
@@ -49,13 +50,13 @@ namespace matth {
 				if ( pDepth > cData.depth || cData.depth >= 0.0f ) {
 					cData.depth = pDepth;
 				}
-				cData.normal = axes[axis];
+				cData.normal = ( pDepth == ( aMax - bMin ) ? -axes[axis] : axes[axis] );
 			}
 			// handle case where there is overlap and no gap has been detected yet
 			else if ( pDepth >= 0.0f && cData.depth > 0.0f && cData.depth > pDepth ) {
 				cData.depth = pDepth;
 				cData.wasCollision = true;
-				cData.normal = axes[axis];
+				cData.normal = ( pDepth == ( aMax - bMin ) ? -axes[axis] : axes[axis] );
 			}
 		}
 		return cData;
@@ -90,13 +91,13 @@ namespace matth {
 				if ( pDepth > cData.depth || cData.depth >= 0.0f ) {
 					cData.depth = pDepth;
 				}
-				cData.normal = axis;
+				cData.normal = ( pDepth == ( aMax - bMin ) ? -axis : axis );
 			}
 			// handle case where there is overlap and no gap has been detected yet
 			else if ( pDepth >= 0.0f && cData.depth > 0.0f && cData.depth > pDepth ) {
 				cData.depth = pDepth;
 				cData.wasCollision = true;
-				cData.normal = axis;
+				cData.normal = ( pDepth == ( aMax - bMin ) ? -axis : axis );
 			}
 		}
 		return cData;
@@ -160,6 +161,7 @@ namespace matth {
 
 		// if less than 0 there was an overlap
 		cData.wasCollision = cData.depth <= 0.0f;
+		cData.depth = -cData.depth;
 		return cData;
 	}
 
@@ -199,13 +201,13 @@ namespace matth {
 				if ( pDepth > cData.depth || cData.depth >= 0.0f ) {
 					cData.depth = pDepth;
 				}
-				cData.normal = axes[axis];
+				cData.normal = ( pDepth == ( aMax - bMin ) ? axes[axis] : axes[axis] );
 			}
 			// handle case where there is overlap and no gap has been detected yet
 			else if ( pDepth >= 0.0f && cData.depth > 0.0f && cData.depth > pDepth ) {
 				cData.depth = pDepth;
 				cData.wasCollision = true;
-				cData.normal = axes[axis];
+				cData.normal = axes[axis];// ( pDepth == ( aMax - bMin ) ? -axes[axis] : axes[axis] );
 			}
 		}
 		//std::cout << "aabb vs chull depth: " << cData.depth << std::endl;
@@ -254,23 +256,24 @@ namespace matth {
 		return cData;
 	}
 
-	CollisionData collisionTest( const AABB& a, const Circle& b ) {
+	CollisionData collisionTest( const Circle& a, const AABB& b ){
 		CollisionData cData;
-		vec2 point = { clamp( b.pos.x, a.min().x, a.max().x ), clamp( b.pos.y, a.min().y, a.max().y ) };
+		std::cout << "circle pos: " <<  a.pos.x << ", " << a.pos.y << " rad: " << a.radius << std::endl;
+		std::cout << "aabb pos: " << b.pos.x << ", " << b.pos.y << " extents: " << b.hExtents.x << ", " << b.hExtents.y << std::endl;
+		vec2 point = { clamp( a.pos.x, b.min().x, b.max().x ), clamp( a.pos.y, b.min().y, b.max().y ) };
 		//std::cout << "pos: " << a.pos.x << ", " << a.pos.y << std::endl;
 		//std::cout << "extents: " << a.hExtents.x << ", " << a.hExtents.y << std::endl;
 		//std::cout << "rect min: " << a.min().x << ", " << a.min().y << std::endl;
 		//std::cout << "rect max: " << a.max().x << ", " << a.max().y << std::endl << std::endl;
 		//std::cout << "clamped: " << point.x << ", " << point.y << std::endl;
-		const float dist = ( point - b.pos ).length();
+		const float dist = ( point - a.pos ).length();
 
 		// get collision normal
 		vec2 normal = { 0.0f, 0.0f };
-		if ( point.x == a.min().x ) { cData.normal.x = -1.0f; } else if ( point.x == a.max().x ) { cData.normal.x = 1.0f; }
-
-		if ( point.y == a.min().y ) { cData.normal.y = -1.0f; } else if ( point.y == a.max().y ) { cData.normal.y = 1.0f; }
-		cData.depth = b.radius - dist;
-		cData.wasCollision = ( cData.depth >= 0.0f );
+		if ( point.x == b.min().x ) { cData.normal.x = -1.0f; } else if ( point.x == b.max().x ) { cData.normal.x = 1.0f; }
+		if ( point.y == b.min().y ) { cData.normal.y = -1.0f; } else if ( point.y == b.max().y ) { cData.normal.y = 1.0f; }
+		cData.depth = a.radius - dist;
+		cData.wasCollision = ( cData.depth > 0.0f );
 
 		return cData;
 	}

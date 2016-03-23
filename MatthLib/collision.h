@@ -30,8 +30,8 @@ namespace matth {
 	inline CollisionData collisionTest( const AABB& a, const ConvexHull& b ) { return collisionTest( b, a ); }
 
 	CollisionData collisionTest( const AABB& a, const AABB& b );
-	CollisionData collisionTest( const AABB& a, const Circle& b );
-	inline CollisionData collisionTest( const Circle& a, const AABB& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const Circle& a, const AABB& b );
+	inline CollisionData collisionTest( const AABB& a, const Circle& b ) { return collisionTest( b, a ); }
 	CollisionData collisionTest( const AABB& a, const Plane& b );
 	inline CollisionData collisionTest( const Plane& a, const AABB& b ) { return collisionTest( b, a ); }
 	CollisionData collisionTest( const AABB& a, const Ray& b );
@@ -45,21 +45,6 @@ namespace matth {
 	CollisionData collisionTest( const Ray& a, const Plane& b );
 	inline CollisionData collisionTest( const Plane& a, const Ray& b ) { return collisionTest( b, a ); }
 	CollisionData collisionTest( const Plane& a, const Plane& b );
-
-	template<class T>
-	T min( const T& a, const T& b ) {
-		return ( a < b ? a : b );
-	}
-	template<class T>
-	T max( const T& a, const T& b ) {
-		return ( a > b ? a : b );
-	}
-	template<class T>
-	T clamp( const T& a, const T& min, const T& max ) {
-		if ( a < min ) return min;
-		if ( a > max ) return max;
-		return a;
-	}
 }
 
 

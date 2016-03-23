@@ -22,7 +22,7 @@ public:
 
 	Handle<Entity> createShape( Handle<Entity>& i ) const {
 		auto& spawner = *i->shapeSpawner;
-		const unsigned shapeType = rand() % 2;
+		const unsigned shapeType = rand() % 3;
 		const float scale = spawner.minScale + getRandomPercent() * ( spawner.maxScale - spawner.minScale );
 		Handle<Entity> entity;
 		switch ( shapeType ) {
@@ -39,7 +39,8 @@ public:
 		case 2: {
 			entity = Factory::makeDynamicCollisionShape( Collider::SHAPE::e_CHULL );
 			// create an n sided polygon
-			const unsigned numSides = 3 +rand() % 6;
+			unsigned numSides = 3 +rand() % 6;
+			if ( numSides == 4 ) numSides++;
 			const float r = 0.5f;
 			for ( unsigned i = 0; i < numSides; ++i ) {
 				const float x = r * (float)cos( ( 2 * PI * i ) / numSides );
@@ -75,7 +76,7 @@ public:
 
 			// set life time
 			shape->lifeTime = LifeTime::make();
-			shape->lifeTime->setLifeTime( 5.0f );
+			shape->lifeTime->setLifeTime( 20.0f );
 
 			// get speed, angle and set vel
 			const float speed = spawner.spawnMinSpeed + getRandomPercent() * ( spawner.spawnMaxSpeed - spawner.spawnMinSpeed );
