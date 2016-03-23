@@ -38,14 +38,21 @@ struct Factory {
 		return e;
 	}
 
-	static Handle<Entity> makeCollisionShape( Collider::SHAPE shape ) {
+	static Handle<Entity> makeDynamicCollisionShape( Collider::SHAPE shape ) {
 		auto e = Entity::make();
 		e->collider = Collider::make();
 		e->collider->shape = shape;
 		e->rigidbody = RigidBody::make();
 		e->transform = Transform::make();
-		e->lifeTime = LifeTime::make();
-		e->lifeTime->setLifeTime( 5.0f );
+		e->push = PushForce::make();
+		return e;
+	}
+
+	static Handle<Entity> makeStaticCollisionShape( Collider::SHAPE shape ) {
+		auto e = Entity::make();
+		e->collider = Collider::make();
+		e->collider->shape = shape;
+		e->transform = Transform::make();
 		return e;
 	}
 

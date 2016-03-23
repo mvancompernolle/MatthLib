@@ -41,8 +41,10 @@ namespace matth {
 	inline CollisionData collisionTest( const Plane& a, const Circle& b ) { return collisionTest( b, a ); }
 	CollisionData collisionTest( const Circle& a, const Ray& b );
 	inline CollisionData collisionTest( const Ray& a, const Circle& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const Ray& a, const Ray& b );
 	CollisionData collisionTest( const Ray& a, const Plane& b );
 	inline CollisionData collisionTest( const Plane& a, const Ray& b ) { return collisionTest( b, a ); }
+	CollisionData collisionTest( const Plane& a, const Plane& b );
 
 	template<class T>
 	T min( const T& a, const T& b ) {

@@ -7,6 +7,7 @@
 #include "PlayerController.h"
 #include "ShapeSpawner.h"
 #include "Sprite.h"
+#include "PushForce.h"
 
 class Entity : public GCData<Entity> {
 public:
@@ -17,6 +18,7 @@ public:
 	Handle<PlayerController> controller;
 	Handle<Sprite> sprite;
 	Handle<ShapeSpawner> shapeSpawner;
+	Handle<PushForce> push;
 
 	void onFree() {
 		Transform::free( transform );
@@ -26,6 +28,7 @@ public:
 		Sprite::free( sprite );
 		ShapeSpawner::free( shapeSpawner );
 		PlayerController::free( controller );
+		PushForce::free( push );
 	}
 };
 

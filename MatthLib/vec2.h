@@ -30,6 +30,7 @@ namespace matth {
 	};
 
 	float dot( const vec2& lhs, const vec2& rhs );
+	float cross( const vec2& lhs, const vec2& rhs );
 	vec2 projection( const vec2& lhs, const vec2& rhs );
 	vec2 lerp( const vec2& lhs, const vec2& rhs, float val );
 

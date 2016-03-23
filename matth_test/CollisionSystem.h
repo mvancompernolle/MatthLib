@@ -21,8 +21,10 @@ class CollisionSystem{
 public:
 	void step() {
 		onStep();
-		for each( Collision c in Collision::getData() ) {
-			update( c );
+		for each( Collision coll in Collision::getData() ) {
+			if ( condition(coll) ) {
+				update( coll );
+			}
 		}
 	}
 };

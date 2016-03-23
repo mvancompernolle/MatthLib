@@ -42,7 +42,7 @@ namespace matth {
 			}
 
 			float pDepth = fminf( aMax - bMin, bMax - aMin );
-			
+
 			// handle case where there was a gap and no collision
 			if ( pDepth < 0.0f ) {
 				cData.wasCollision = false;
@@ -106,34 +106,42 @@ namespace matth {
 		CollisionData cData = { false };
 		cData.depth = INFINITY;
 		std::vector<vec2> axes;
-	
+
+		// get all of the axes to project onto
 		for ( int i = 0; i < a.verts.size(); ++i ) {
 			const vec2 vecBetween = a.verts[i] - a.verts[( i + 1 ) % a.verts.size()];
 			axes.push_back( vecBetween.normal().perp() );
 		}
 
-		float tMin = 0.0f, tMax = 1.0f;
+		float tMin = 0.0f, tMax = INFINITY;
 
 		for ( int i = 0; i < axes.size(); ++i ) {
 			// get the point plane distance
+			// this is positive if ray starts in front of the edge
 			const float N = dot( axes[i], b.pos - a.verts[i] );
+			// get the relative direction of the ray compared to the edge normal
+			// this is positive when the ray is facing the outside of the edge
+			const float D = -dot( axes[i], b.dir );
 
-			// if they are facing eachother this is greater than 0
-			const float D = -dot( axes[i], b.dir ); 
+			// if D is 0, then it is parallel with the line so it will never collide
+			if ( fabs( D ) < FLT_EPSILON ) {
+				continue;
+			}
+			// get the distance from the ray start to the plane
 			const float dist = N / D;
 
-			if ( D < 0.0f && dist > tMin) {
-				// ray is facing the plane and ray is further penetrating the hull
-				tMin = dist;
-				cData.normal = axes[i];
-				cData.wasCollision = tMin < tMax;
-				cData.depth = ( tMax - tMin ) * b.len;
+			if ( D > 0.0f ) {
+				// when entering a side
+				// set min to the farthest entry point
+				tMin = fmaxf( tMin, dist );
 			} else {
-				tMax = fminf(tMax, dist );
+				// when exiting side
+				tMax = fminf( tMax, dist );
 			}
-
-			if ( tMin < tMax ) return cData;
 		}
+		cData.normal = -b.dir;
+		cData.depth = ( tMin == 0.0f ? 0.0f : b.len - tMin );
+		cData.wasCollision = ( tMin < tMax && tMin < b.len );
 		return cData;
 	}
 
@@ -165,7 +173,7 @@ namespace matth {
 			vec2 vecBetween = a.verts[i] - a.verts[( i + 1 ) % a.verts.size()];
 			axes.push_back( vecBetween.normal().perp() );
 		}
-		axes.push_back(  vec2{0.0f, 1.0f} );
+		axes.push_back( vec2{ 0.0f, 1.0f } );
 		axes.push_back( vec2{ 1.0f, 0.0f } );
 
 		for ( int axis = 0; axis < axes.size(); ++axis ) {
@@ -221,7 +229,7 @@ namespace matth {
 			const float gapY = -abs( top ) > bottom ? -abs( top ) : bottom;
 			//std::cout << "gapX: " << gapX << " gapY: " << gapY << std::endl;
 
-			if (left > 0.0f || right < 0.0f ) {
+			if ( left > 0.0f || right < 0.0f ) {
 				cData.normal.x = ( gapX == right ? gapX : -gapX );
 			}
 			if ( top > 0.0f || bottom < 0.0f ) {
@@ -239,7 +247,7 @@ namespace matth {
 				cData.normal = ( collX == right ? vec2{ 1.0f, 0.0f } : vec2{ -1.0f, 0.0f } );
 			} else {
 				cData.depth = collY;
-				cData.normal = ( collX == bottom ? vec2{ 0.0f, -1.0f } : vec2{ 0.0f, 1.0f } );
+				cData.normal = ( collY == bottom ? vec2{ 0.0f, 1.0f } : vec2{ 0.0f, -1.0f } );
 			}
 		}
 		cData.wasCollision = cData.depth >= 0.0f;
@@ -320,7 +328,7 @@ namespace matth {
 		CollisionData cData;
 		const float dist = ( b.pos - a.pos ).length();
 		cData.depth = ( a.radius + b.radius ) - dist;
-		cData.wasCollision = cData.depth >= 0.0f;
+		cData.wasCollision = cData.depth > 0.0f;
 		cData.normal = ( a.pos - b.pos ).normal();
 		return cData;
 	}
@@ -345,6 +353,50 @@ namespace matth {
 		return cData;
 	}
 
+	CollisionData collisionTest( const Ray& a, const Ray& b ) {
+		CollisionData cData;
+		cData.normal = -a.dir;
+		const vec2& p1 = a.pos;
+		const vec2 p2 = a.pos + ( a.dir * a.len );
+		const vec2& q1 = b.pos;
+		const vec2 q2 = b.pos + ( b.dir * b.len );
+
+		const vec2 r = p2 - p1;
+		const vec2 s = q2 - q1;
+		const float rCrossS = cross( r, s );
+		const float qpCrossR = cross( q1 - p1, r );
+
+		// if r x s = 0 and ( p - q ) x r = 0 then the two lines are collinear
+		if ( abs( rCrossS ) < FLT_EPSILON && abs( qpCrossR ) < FLT_EPSILON ) {
+			// 1. the two lines are collinear and overlapping
+			if ( ( 0 <= dot( q1 - p1, r ) && dot( q1 - p1, r ) <= 1 ) || ( 0 <= dot( p1 - q1, s ) && dot( p1 - q1, s ) <= 1 ) ) {
+				cData.wasCollision = true;
+			}
+			else {
+				// 2. the lines are collinear but are disjoint
+				cData.wasCollision = false;
+			}
+		}
+		// 3. the two lines are parallel and non-intersecting
+		else if ( abs( rCrossS ) < FLT_EPSILON && !abs( qpCrossR ) >= FLT_EPSILON ) {
+			cData.wasCollision = false;
+		}
+
+		const float t = cross( q1 - p1, s ) / rCrossS;
+		const float u = cross( q1 - p1, r ) / rCrossS;
+
+		// 4. the two lines meet at the point p + tr = q + us
+		if ( !abs(rCrossS) < FLT_EPSILON && (0.0f <= t && t <= 1.0f) && (0.0f <= u && u <= 1.0f) ) {
+			cData.wasCollision = true;
+			cData.depth = (1.0f - t) * a.len;
+		}
+		else {
+			if( ( t > 1.0f ) && ( 0.0f <= u && u <= 1.0f ) ) cData.depth = ( 1.0f - t ) * a.len;
+			cData.wasCollision = false;
+		}
+		return cData;
+	}
+
 	CollisionData collisionTest( const Ray& a, const Plane& b ) {
 		// gets the shortest vector to move out of collision with Plane
 		CollisionData cData{ true };
@@ -353,7 +405,7 @@ namespace matth {
 		// if not facing the plane
 		if ( dotVal <= 0.0f ) {
 			// colliding only if behind the plane
-			cData.wasCollision = (pointPos < 0.0f);
+			cData.wasCollision = ( pointPos < 0.0f );
 		} else {
 			// get distance to plane
 			const float rayPlaneDistance = pointPos / dotVal;
@@ -361,7 +413,13 @@ namespace matth {
 			cData.normal = -a.dir;
 			cData.wasCollision = ( cData.depth > 0.0f );
 		}
-		std::cout << "ray vs plane depth: " << cData.depth << std::endl;
 		return cData;
+	}
+
+	CollisionData collisionTest( const Plane& a, const Plane& b ) {
+		// overlapping if a is behind b, b is behind a, or no facing eachother
+		bool overlapping = ( abs( -1.0f - dot( a.normal, b.normal ) ) > FLT_EPSILON )
+			|| ( dot( a.pos - b.pos, b.normal ) < 0.0f ) || ( dot( b.pos - a.pos, a.normal ) < 0.0f );
+		return CollisionData{ overlapping };
 	}
 }

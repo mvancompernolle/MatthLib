@@ -48,6 +48,10 @@ namespace matth {
 		return lhs.x * rhs.x + lhs.y * rhs.y;
 	}
 
+	float cross( const vec2& lhs, const vec2& rhs ) {
+		return lhs.x * rhs.y - lhs.y * rhs.x;
+	}
+
 	vec2 projection( const vec2& lhs, const vec2& rhs ) {
 		vec2 norm = rhs.normal();
 		return dot( lhs, norm ) * norm;
