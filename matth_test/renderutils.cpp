@@ -1,9 +1,10 @@
 #include "renderutils.h"
 
 void drawMatrix( const matth::mat3& mat, unsigned TINT ) {
+	float size = 50.0f;
 	matth::vec2 pos = mat[2].xy;
-	matth::vec2 up = pos + mat[1].xy;
-	matth::vec2 right = pos + mat[0].xy;
+	matth::vec2 up = pos + mat[1].xy.normal() * size;
+	matth::vec2 right = pos + mat[0].xy.normal() * size;
 
 	sfw::drawLine( pos.x, pos.y, right.x, right.y, RED );
 	sfw::drawLine( pos.x, pos.y, up.x, up.y, GREEN );

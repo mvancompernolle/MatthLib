@@ -33,9 +33,18 @@ class CollisionDetection : public BinarySystem {
 	void onStep() { Collision::getData().clear();  }
 	bool condition( Handle<Entity> i ) { return i->transform > -1 && i->collider > -1; }
 	void update( Handle<Entity> i, Handle<Entity> j ) {
-		auto cd = evaluateCollision( *i->transform, *i->collider, *j->transform, *j->collider );
+
+		// ensure smaller shape type is first one passed in
+		Handle<Entity> entLeft = i;
+		Handle<Entity> entRight = j;
+		if ( entLeft->collider->shape > entRight->collider->shape ) {
+			std::swap( entLeft, entRight );
+		}
+
+		auto cd = evaluateCollision( *entLeft->transform, *entLeft->collider, 
+			*entRight->transform, *entRight->collider );
 		if ( cd.wasCollision ) {
-			Collision::getData().push_back( Collision{ i, j, cd } );
+			Collision::getData().push_back( Collision{ entLeft, entRight, cd } );
 		}
 	}
 };

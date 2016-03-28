@@ -91,13 +91,13 @@ namespace matth {
 				if ( pDepth > cData.depth || cData.depth >= 0.0f ) {
 					cData.depth = pDepth;
 				}
-				cData.normal = ( pDepth == ( aMax - bMin ) ? -axis : axis );
+				cData.normal = ( pDepth == ( aMax - bMin ) ? axis : -axis );
 			}
 			// handle case where there is overlap and no gap has been detected yet
 			else if ( pDepth >= 0.0f && cData.depth > 0.0f && cData.depth > pDepth ) {
 				cData.depth = pDepth;
 				cData.wasCollision = true;
-				cData.normal = ( pDepth == ( aMax - bMin ) ? -axis : axis );
+				cData.normal = ( pDepth == ( aMax - bMin ) ? axis : -axis );
 			}
 		}
 		return cData;
@@ -201,16 +201,15 @@ namespace matth {
 				if ( pDepth > cData.depth || cData.depth >= 0.0f ) {
 					cData.depth = pDepth;
 				}
-				cData.normal = ( pDepth == ( aMax - bMin ) ? axes[axis] : axes[axis] );
+				cData.normal = ( pDepth == ( aMax - bMin ) ? axes[axis] : -axes[axis] );
 			}
 			// handle case where there is overlap and no gap has been detected yet
 			else if ( pDepth >= 0.0f && cData.depth > 0.0f && cData.depth > pDepth ) {
 				cData.depth = pDepth;
 				cData.wasCollision = true;
-				cData.normal = axes[axis];// ( pDepth == ( aMax - bMin ) ? -axes[axis] : axes[axis] );
+				cData.normal = ( pDepth == ( aMax - bMin ) ? axes[axis] : -axes[axis] );
 			}
 		}
-		//std::cout << "aabb vs chull depth: " << cData.depth << std::endl;
 		return cData;
 	}
 
@@ -229,7 +228,6 @@ namespace matth {
 			const float gapX = -abs( left ) > right ? -abs( left ) : right;
 			// get min vertical movement needed for a y overlap
 			const float gapY = -abs( top ) > bottom ? -abs( top ) : bottom;
-			//std::cout << "gapX: " << gapX << " gapY: " << gapY << std::endl;
 
 			if ( left > 0.0f || right < 0.0f ) {
 				cData.normal.x = ( gapX == right ? gapX : -gapX );
@@ -238,7 +236,6 @@ namespace matth {
 				cData.normal.y = ( gapY == bottom ? gapY : -gapY );
 			}
 			cData.depth = -cData.normal.length();
-			//std::cout << "normal: " << cData.normal.x << ", " << cData.normal.y << std::endl;
 			cData.normal = cData.normal.normal();
 		} else {
 			// there is an overlap
@@ -258,14 +255,7 @@ namespace matth {
 
 	CollisionData collisionTest( const Circle& a, const AABB& b ){
 		CollisionData cData;
-		std::cout << "circle pos: " <<  a.pos.x << ", " << a.pos.y << " rad: " << a.radius << std::endl;
-		std::cout << "aabb pos: " << b.pos.x << ", " << b.pos.y << " extents: " << b.hExtents.x << ", " << b.hExtents.y << std::endl;
 		vec2 point = { clamp( a.pos.x, b.min().x, b.max().x ), clamp( a.pos.y, b.min().y, b.max().y ) };
-		//std::cout << "pos: " << a.pos.x << ", " << a.pos.y << std::endl;
-		//std::cout << "extents: " << a.hExtents.x << ", " << a.hExtents.y << std::endl;
-		//std::cout << "rect min: " << a.min().x << ", " << a.min().y << std::endl;
-		//std::cout << "rect max: " << a.max().x << ", " << a.max().y << std::endl << std::endl;
-		//std::cout << "clamped: " << point.x << ", " << point.y << std::endl;
 		const float dist = ( point - a.pos ).length();
 
 		// get collision normal
@@ -356,6 +346,7 @@ namespace matth {
 		return cData;
 	}
 
+	// Reference : http://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments
 	CollisionData collisionTest( const Ray& a, const Ray& b ) {
 		CollisionData cData;
 		cData.normal = -a.dir;

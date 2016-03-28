@@ -23,9 +23,6 @@ class StaticResolution : public CollisionSystem {
 				//normal = -normal;
 			}
 
-			std::cout << "depth: " << c.collisionData.depth 
-			 << " normal: " << normal.x << ", " << normal.y << std::endl;
-
 			// move the dynamic body by the minimum translate
 			matth::vec2 mtv = c.collisionData.depth * normal;
 			matth::vec2 newPos = dynamicBody->transform->getPos() + mtv;
